@@ -13,6 +13,7 @@
     <script type="text/javascript" src="Transformations.js"></script>
     <script type="text/javascript" src="Camera.js"></script>
     <script type="text/javascript" src="Textures.js"></script>
+    <script type="text/javascript" src="Tresor.js.js"></script>
     <script type="text/javascript">
 
         var objgl = null;
@@ -21,6 +22,7 @@
 
         var TEX_TRANSPARENT = 0;
         var TEX_PIERRES = 1;
+        var TEX_TRESOR = 2;
 
         // ── Types de cellules du dédale ────────────────────────────────
         const COULOIR = 0;  // cellule vide, le joueur peut y circuler
@@ -47,7 +49,7 @@
 
             objScene3D.dedale = creerDedale(31);
 
-            objScene3D.textures = await creerTextures(objgl, ['Transparent.gif', 'Pierres.jpg']);
+            objScene3D.textures = await creerTextures(objgl, ['Transparent.gif', 'Pierres.jpg', 'coffre.jpg']);
 
             // ── PLANCHER COULOIRS ──────────────────────────
             let plancherCouloir = new Object();
@@ -102,7 +104,11 @@
 
             objScene3D.tabObjets3D = tabObjets3D;
 
-            
+            // ── TRÉSOR ─────────────────────────────────────────────────────
+            let tresor = creerTresore(objgl, [1.0, 1.0, 1.0, 1.0]);
+            setPositionsXYZ([27, 0, 15.5], tresor.transformations);
+            setEchellesXYZ([0.7, 0.4, 0.4], tresor.transformations);
+            tabObjets3D.push(tresor);
 
             // ── CAMÉRA ─────────────────────────────────────────────────────
             var camera = creerCamera();
@@ -315,6 +321,8 @@
             return buf;
         }
 
+
+
         // function creerCube(objgl) {
         //     var objCube = objgl.createBuffer();
 
@@ -373,6 +381,7 @@
             return objTexelsCube;
         }
 
+
         // Le maillage 
         function creerMaillageCube(objgl) {
             var objMaillageCube = objgl.createBuffer();
@@ -400,6 +409,7 @@
 
             return objMaillageCube;
         }
+
 
         // function creerPlan(objgl) {
         //     let obj = objgl.createBuffer();
@@ -472,18 +482,6 @@
             objet3D.couleurs = creerCouleursBuffer(objgl, rgba, 8);
             objet3D.maillage = creerMaillageCube(objgl);
             objet3D.texels = null;
-            objet3D.transformations = creerTransformations();
-
-            return objet3D;
-        }
-
-        function creerTresore(objgl, rgba) {
-            let objet3D = new Object();
-
-            objet3D.vertex = creerGeometrieCube(objgl);
-            objet3D.couleurs = creerCouleursBuffer(objgl, rgba, 8);
-            objet3D.maillage = creerMaillageCube(objgl);
-            objet3D.texels = creerTexelsCube(objgl);
             objet3D.transformations = creerTransformations();
 
             return objet3D;
