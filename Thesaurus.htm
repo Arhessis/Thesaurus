@@ -13,7 +13,7 @@
     <script type="text/javascript" src="Transformations.js"></script>
     <script type="text/javascript" src="Camera.js"></script>
     <script type="text/javascript" src="Textures.js"></script>
-    <script type="text/javascript" src="Tresor.js.js"></script>
+    <script type="text/javascript" src="Tresor.js"></script>
     <script type="text/javascript">
 
         var objgl = null;
@@ -106,7 +106,7 @@
 
             // ── TRÉSOR ─────────────────────────────────────────────────────
             let tresor = creerTresore(objgl, [1.0, 1.0, 1.0, 1.0]);
-            setPositionsXYZ([27, 0, 15.5], tresor.transformations);
+            setPositionsXYZ([15, 0, 14], tresor.transformations);
             setEchellesXYZ([0.7, 0.4, 0.4], tresor.transformations);
             tabObjets3D.push(tresor);
 

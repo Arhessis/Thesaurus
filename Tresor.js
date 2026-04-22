@@ -3,7 +3,7 @@ function creerTresore(objgl, rgba) {
 
     objet3D.vertex = creerGeometrieTresor(objgl);
     objet3D.couleurs = creerCouleursBuffer(objgl, rgba, 8);
-    objet3D.maillage = creerMaillageCube(objgl);
+    objet3D.maillage = creerMaillageTresor(objgl);
     objet3D.texels = creerTextelsTresor(objgl);
     objet3D.transformations = creerTransformations();
 
