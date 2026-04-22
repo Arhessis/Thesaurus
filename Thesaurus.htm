@@ -105,8 +105,14 @@
             objScene3D.tabObjets3D = tabObjets3D;
 
             // ── TRÉSOR ─────────────────────────────────────────────────────
-            let randomXTresor = Math.floor(Math.random() * 31) + 1;
-            let randomZTresor = Math.floor(Math.random() * 31) + 1;
+            let randomXTresor;
+            let randomZTresor;
+
+            do {
+                randomXTresor = Math.floor(Math.random() * TAILLE_DEDALE);
+                randomZTresor = Math.floor(Math.random() * TAILLE_DEDALE);
+
+            } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR);
 
             let tresor = creerTresore(objgl, [1.0, 1.0, 1.0, 1.0]);
             setPositionsXYZ([randomXTresor, 0, randomZTresor], tresor.transformations);
