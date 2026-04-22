@@ -105,8 +105,11 @@
             objScene3D.tabObjets3D = tabObjets3D;
 
             // ── TRÉSOR ─────────────────────────────────────────────────────
+            let randomXTresor = Math.floor(Math.random() * 31) + 1;
+            let randomZTresor = Math.floor(Math.random() * 31) + 1;
+
             let tresor = creerTresore(objgl, [1.0, 1.0, 1.0, 1.0]);
-            setPositionsXYZ([15, 0, 14], tresor.transformations);
+            setPositionsXYZ([randomXTresor, 0, randomZTresor], tresor.transformations);
             setEchellesXYZ([0.7, 0.4, 0.4], tresor.transformations);
             tabObjets3D.push(tresor);
 
