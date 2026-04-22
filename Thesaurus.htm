@@ -122,21 +122,13 @@
             // ── CAMÉRA ─────────────────────────────────────────────────────
             var camera = creerCamera();
             setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); // centre de l'enclos
-<<<<<<< HEAD:Thesaurus.htm
             setCiblesCameraXYZ([15.5, 0.5, 14.5], camera);    // regarde vers le nord (Z diminue)
-=======
-            setCiblesCameraXYZ([15.5, 0.5, 16.5], camera);    // regarde vers le nord (Z diminue)
->>>>>>> origin/v2.2:Mur de pierres.htm
             setOrientationsXYZ([0, 1, 0], camera);
             objScene3D.camera = camera;
 
             // var camera = creerCamera();
 
-<<<<<<< HEAD:Thesaurus.htm
             // setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
-=======
-            // setPositionsCameraXYZ([15.5, 100, 15.5], camera);    // Positioned directly above center
->>>>>>> origin/v2.2:Mur de pierres.htm
             // setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
             // setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
             // objScene3D.camera = camera;
@@ -446,8 +438,7 @@ function placerLigneMiroirY(dedale, x, y, length, type, direction) {
             return buf;
         }
 
-<<<<<<< HEAD:Thesaurus.htm
-
+        
 
         // function creerCube(objgl) {
         //     var objCube = objgl.createBuffer();
@@ -478,8 +469,6 @@ function placerLigneMiroirY(dedale, x, y, length, type, direction) {
         //     objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tab), objgl.STATIC_DRAW);
         //     return obj;
         // }
-=======
->>>>>>> origin/v2.2:Mur de pierres.htm
 
         // Relier un texel à un vertex
         function creerTexelsCube(objgl) {
@@ -538,7 +527,6 @@ function placerLigneMiroirY(dedale, x, y, length, type, direction) {
             return objMaillageCube;
         }
 
-<<<<<<< HEAD:Thesaurus.htm
 
         // function creerPlan(objgl) {
         //     let obj = objgl.createBuffer();
@@ -555,8 +543,6 @@ function placerLigneMiroirY(dedale, x, y, length, type, direction) {
 
         //     return obj;
         // }
-=======
->>>>>>> origin/v2.2:Mur de pierres.htm
 
         function creerCouleursBuffer(objgl, rgba, nbSommets) {
             let buf = objgl.createBuffer();
