@@ -102,19 +102,21 @@
 
             objScene3D.tabObjets3D = tabObjets3D;
 
+            
+
             // ── CAMÉRA ─────────────────────────────────────────────────────
-            // var camera = creerCamera();
-            // setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); // centre de l'enclos
-            // setCiblesCameraXYZ([15.5, 0.5, 14.5], camera);    // regarde vers le nord (Z diminue)
-            // setOrientationsXYZ([0, 1, 0], camera);
-            // objScene3D.camera = camera;
-
             var camera = creerCamera();
-
-            setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
-            setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
-            setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
+            setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); // centre de l'enclos
+            setCiblesCameraXYZ([15.5, 0.5, 14.5], camera);    // regarde vers le nord (Z diminue)
+            setOrientationsXYZ([0, 1, 0], camera);
             objScene3D.camera = camera;
+
+            // var camera = creerCamera();
+
+            // setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
+            // setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
+            // setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
+            // objScene3D.camera = camera;
 
             return objScene3D;
         }
@@ -470,6 +472,18 @@
             objet3D.couleurs = creerCouleursBuffer(objgl, rgba, 8);
             objet3D.maillage = creerMaillageCube(objgl);
             objet3D.texels = null;
+            objet3D.transformations = creerTransformations();
+
+            return objet3D;
+        }
+
+        function creerTresore(objgl, rgba) {
+            let objet3D = new Object();
+
+            objet3D.vertex = creerGeometrieCube(objgl);
+            objet3D.couleurs = creerCouleursBuffer(objgl, rgba, 8);
+            objet3D.maillage = creerMaillageCube(objgl);
+            objet3D.texels = creerTexelsCube(objgl);
             objet3D.transformations = creerTransformations();
 
             return objet3D;
