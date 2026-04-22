@@ -13,6 +13,7 @@
     <script type="text/javascript" src="Transformations.js"></script>
     <script type="text/javascript" src="Camera.js"></script>
     <script type="text/javascript" src="Textures.js"></script>
+    <script type="text/javascript" src="Tresor.js"></script>
     <script type="text/javascript">
 
         var objgl = null;
@@ -21,6 +22,7 @@
 
         var TEX_TRANSPARENT = 0;
         var TEX_PIERRES = 1;
+        var TEX_TRESOR = 2;
 
         // ── Types de cellules du dédale ────────────────────────────────
         const COULOIR = 0;  // cellule vide, le joueur peut y circuler
@@ -47,7 +49,7 @@
 
             objScene3D.dedale = creerDedale(31);
 
-            objScene3D.textures = await creerTextures(objgl, ['Transparent.gif', 'Pierres.jpg']);
+            objScene3D.textures = await creerTextures(objgl, ['Transparent.gif', 'Pierres.jpg', 'coffre.jpg']);
 
             // ── PLANCHER COULOIRS ──────────────────────────
             let plancherCouloir = new Object();
@@ -102,19 +104,34 @@
 
             objScene3D.tabObjets3D = tabObjets3D;
 
+            // ── TRÉSOR ─────────────────────────────────────────────────────
+            let randomXTresor;
+            let randomZTresor;
+
+            do {
+                randomXTresor = Math.floor(Math.random() * TAILLE_DEDALE);
+                randomZTresor = Math.floor(Math.random() * TAILLE_DEDALE);
+
+            } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR);
+
+            let tresor = creerTresore(objgl, [1.0, 1.0, 1.0, 1.0]);
+            setPositionsXYZ([randomXTresor, 0, randomZTresor], tresor.transformations);
+            setEchellesXYZ([0.7, 0.4, 0.4], tresor.transformations);
+            tabObjets3D.push(tresor);
+
             // ── CAMÉRA ─────────────────────────────────────────────────────
-            // var camera = creerCamera();
-            // setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); // centre de l'enclos
-            // setCiblesCameraXYZ([15.5, 0.5, 14.5], camera);    // regarde vers le nord (Z diminue)
-            // setOrientationsXYZ([0, 1, 0], camera);
-            // objScene3D.camera = camera;
-
             var camera = creerCamera();
-
-            setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
-            setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
-            setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
+            setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); // centre de l'enclos
+            setCiblesCameraXYZ([15.5, 0.5, 14.5], camera);    // regarde vers le nord (Z diminue)
+            setOrientationsXYZ([0, 1, 0], camera);
             objScene3D.camera = camera;
+
+            // var camera = creerCamera();
+
+            // setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
+            // setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
+            // setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
+            // objScene3D.camera = camera;
 
             return objScene3D;
         }
@@ -313,6 +330,8 @@
             return buf;
         }
 
+
+
         // function creerCube(objgl) {
         //     var objCube = objgl.createBuffer();
 
@@ -371,6 +390,7 @@
             return objTexelsCube;
         }
 
+
         // Le maillage 
         function creerMaillageCube(objgl) {
             var objMaillageCube = objgl.createBuffer();
@@ -398,6 +418,7 @@
 
             return objMaillageCube;
         }
+
 
         // function creerPlan(objgl) {
         //     let obj = objgl.createBuffer();
