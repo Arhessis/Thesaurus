@@ -14,6 +14,8 @@
     <script type="text/javascript" src="Camera.js"></script>
     <script type="text/javascript" src="Textures.js"></script>
     <script type="text/javascript" src="Tresor.js"></script>
+    <script type="text/javascript" src="Fleche.js"></script>
+
     <script type="text/javascript">
 
         var objgl = null;
@@ -105,6 +107,8 @@
             objScene3D.tabObjets3D = tabObjets3D;
 
             // ── TRÉSOR ─────────────────────────────────────────────────────
+            var tresor = creerTresore(objgl, [1.0, 1.0, 1.0, 1.0]);
+
             let randomXTresor;
             let randomZTresor;
 
@@ -114,19 +118,17 @@
 
             } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR);
 
-            let tresor = creerTresore(objgl, [1.0, 1.0, 1.0, 1.0]);
             setPositionsXYZ([randomXTresor, 0, randomZTresor], tresor.transformations);
             setEchellesXYZ([0.7, 0.4, 0.4], tresor.transformations);
             tabObjets3D.push(tresor);
 
             // ── CAMÉRA ─────────────────────────────────────────────────────
             var camera = creerCamera();
+
             setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); // centre de l'enclos
             setCiblesCameraXYZ([15.5, 0.5, 14.5], camera);    // regarde vers le nord (Z diminue)
             setOrientationsXYZ([0, 1, 0], camera);
             objScene3D.camera = camera;
-
-            // var camera = creerCamera();
 
             // setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
             // setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
@@ -134,6 +136,18 @@
             // objScene3D.camera = camera;
 
             return objScene3D;
+
+            // ── Flèche ─────────────────────────────────────────────────────
+            var fleche = creerFleche(objgl, [1.0, 1.0, 1.0, 1.0]);
+
+            let flecheX = getPositionCameraX(camera);
+            let flecheY = getPositionCameraY(camera) - 0.5; // Positionner la flèche légèrement au-dessus de la caméra
+            let flecheZ = getPositionCameraZ(camera) + 0.5; // Positionner la flèche légèrement devant la caméra
+
+            setPositionsXYZ([flecheX, flecheY, flecheZ], fleche.transformations);
+            setEchellesXYZ([0.7, 0.4, 0.4], fleche.transformations);
+            tabObjets3D.push(fleche);
+
         }
 
         function dessiner(objgl, objProgShaders, objScene3D) {
