@@ -103,18 +103,18 @@
             objScene3D.tabObjets3D = tabObjets3D;
 
             // ── CAMÉRA ─────────────────────────────────────────────────────
-            // var camera = creerCamera();
-            // setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); // centre de l'enclos
-            // setCiblesCameraXYZ([15.5, 0.5, 14.5], camera);    // regarde vers le nord (Z diminue)
-            // setOrientationsXYZ([0, 1, 0], camera);
-            // objScene3D.camera = camera;
-
             var camera = creerCamera();
-
-            setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
-            setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
-            setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
+            setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); // centre de l'enclos
+            setCiblesCameraXYZ([15.5, 0.5, 16.5], camera);    // regarde vers le nord (Z diminue)
+            setOrientationsXYZ([0, 1, 0], camera);
             objScene3D.camera = camera;
+
+            // var camera = creerCamera();
+
+            // setPositionsCameraXYZ([15.5, 100, 15.5], camera);    // Positioned directly above center
+            // setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
+            // setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
+            // objScene3D.camera = camera;
 
             return objScene3D;
         }
@@ -242,36 +242,20 @@
             }
         }
 
-        // function creerDedale(taille) {
-        //     let dedale = [];
 
-        //     for (let i = 0; i < taille; i++) {
-        //         let ligne = [];
-        //         for (let j = 0; j < taille; j++) {
-        //             // Bordures = murs non ouvrables
-        //             if (i == 0 || j == 0 || i == taille - 1 || j == taille - 1) {
-        //                 ligne.push(1);
-        //             } else {
-        //                 ligne.push(0); // couloir par défaut
-        //             }
-        //         }
-        //         dedale.push(ligne);
-        //     }
+function placerLigneMiroirY(dedale, x, y, length, type, direction) {
+    let taille = dedale.length;
 
-        //     // Enclos 3x3 au centre
-        //     let centre = Math.floor(taille / 2); // = 15
-        //     for (let i = centre - 1; i <= centre + 1; i++) {
-        //         for (let j = centre - 1; j <= centre + 1; j++) {
-        //             dedale[i][j] = 3;
-        //         }
-        //     }
+    let newX;
 
-        //     // 👉 Tu rempliras les murs intérieurs ici plus tard, ex:
-        //     dedale[29][29] = 2; // mur non ouvrable
-        //     //dedale[5][7] = 2; // mur ouvrable
+    if (direction === "h") {
+        newX = taille - 1 - x - (length - 1);
+    } else {
+        newX = taille - 1 - x;
+    }
 
-        //     return dedale;
-        // }
+    placerLigne(dedale, newX, y, length, type, direction);
+}
 
         function creerDedale(taille) {
             let dedale = [];
@@ -284,12 +268,136 @@
                 }
             }
 
-            // 2. now you can safely place walls
-            placerLigne(dedale, 3, 10, 12, MUR_OUVRABLE, "h");
+            // outer walls
             placerLigne(dedale, 0, 0, 31, MUR_FIXE, "v");
             placerLigne(dedale, 1, 0, 30, MUR_FIXE, "h");
             placerLigne(dedale, 30, 0, 31, MUR_FIXE, "v");
             placerLigne(dedale, 0, 30, 31, MUR_FIXE, "h");
+
+            //spawn walls
+            placerLigne(dedale, 16, 17, 2, MUR_FIXE, "h");
+            placerLigne(dedale, 13, 17, 2, MUR_FIXE, "h");
+            placerLigne(dedale, 13, 13, 4, MUR_FIXE, "v");
+            placerLigne(dedale, 17, 13, 4, MUR_FIXE, "v");
+            placerLigne(dedale, 14, 13, 4, MUR_FIXE, "h");
+
+            //left section
+            placerLigne(dedale, 23, 28, 6, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 23, 26, 7, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 27, 24, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 23, 24, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 27, 22, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 23, 22, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 23, 20, 6, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 25, 18, 5, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 23, 16, 6, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 23, 17, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 23, 14, 7, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 23, 12, 6, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 28, 8, 4, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 23, 10, 4, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 23, 8, 4, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 26, 9, 1, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 23, 2, 6, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 23, 2, 4, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 26, 2, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 25, 4, 2, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 25, 6, 4, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 28, 2, 2, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 28, 2, 3, MUR_OUVRABLE, "v");
+
+            //center section
+            placerLigne(dedale, 17, 28, 5, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 17, 26, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 21, 26, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 18, 26, 1, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 20, 26, 1, MUR_OUVRABLE, "v");
+
+            placerLigne(dedale, 15, 26, 4, MUR_OUVRABLE, "v");
+
+            placerLigne(dedale, 9, 28, 5, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 9, 26, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 13, 26, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 10, 26, 1, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 12, 26, 1, MUR_OUVRABLE, "v");
+
+            placerLigne(dedale, 21, 19, 6, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 19, 19, 2, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 19, 19, 6, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 17, 19, 6, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 18, 24, 1, MUR_OUVRABLE, "v");
+
+            placerLigne(dedale, 15, 19, 6, MUR_OUVRABLE, "v");
+
+            placerLigne(dedale, 13, 19, 6, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 11, 19, 1, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 12, 24, 1, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 11, 19, 6, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 9, 19, 6, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 10, 19, 1, MUR_OUVRABLE, "v");
+
+            placerLigne(dedale, 21, 6, 12, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 19, 17, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 19, 11, 7, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 16, 11, 4, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 16, 8, 4, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 16, 8, 2, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 17, 6, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 17, 6, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 19, 4, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 19, 4, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 21, 2, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 19, 8, 2, MUR_OUVRABLE, "v");
+
+            placerLigne(dedale, 9, 6, 12, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 11, 11, 7, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 9, 17, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 11, 11, 4, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 14, 8, 4, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 13, 8, 2, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 13, 6, 3, MUR_OUVRABLE, "v");
+            
+            placerLigne(dedale, 11, 6, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 11, 4, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 9, 4, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 9, 2, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 11, 8, 2, MUR_OUVRABLE, "v");
+            
+
+            placerLigne(dedale, 15, 6, 1, MUR_OUVRABLE, "h");
+
+            placerLigne(dedale, 11, 2, 9, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 17, 2, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 13, 2, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 14, 4, 1, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 16, 4, 1, MUR_OUVRABLE, "v");
+
+
+            //right section
+            placerLigne(dedale, 2, 28, 6, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 1, 26, 7, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 1, 24, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 5, 24, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 1, 22, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 5, 22, 3, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 2, 20, 6, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 1, 18, 5, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 2, 16, 6, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 7, 17, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 1, 14, 7, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 2, 12, 6, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 2, 8, 4, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 4, 10, 4, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 4, 8, 4, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 4, 9, 1, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 7, 2, 6, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 4, 2, 4, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 4, 2, 3, MUR_OUVRABLE, "v");
+            placerLigne(dedale, 4, 4, 2, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 2, 6, 4, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 1, 2, 2, MUR_OUVRABLE, "h");
+            placerLigne(dedale, 2, 2, 3, MUR_OUVRABLE, "v");
+
 
             return dedale;
         }
@@ -313,35 +421,6 @@
             return buf;
         }
 
-        // function creerCube(objgl) {
-        //     var objCube = objgl.createBuffer();
-
-        //     var tabVertex = [
-        //         // 8 coins du cube
-        //         0.0, 0.0, 0.0,  // 0: avant-bas-gauche
-        //         1.0, 0.0, 0.0,  // 1: avant-bas-droit
-        //         1.0, 1.0, 0.0,  // 2: avant-haut-droit
-        //         0.0, 1.0, 0.0,  // 3: avant-haut-gauche
-        //         0.0, 0.0, 1.0,  // 4: arrière-bas-gauche
-        //         1.0, 0.0, 1.0,  // 5: arrière-bas-droit
-        //         1.0, 1.0, 1.0,  // 6: arrière-haut-droit
-        //         0.0, 1.0, 1.0   // 7: arrière-haut-gauche
-        //     ];
-
-        //     objgl.bindBuffer(objgl.ARRAY_BUFFER, objCube);
-        //     objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tabVertex), objgl.STATIC_DRAW);
-
-        //     return objCube;
-        // }
-
-        // function creerCouleursCube(objgl, rgba) {
-        //     let obj = objgl.createBuffer();
-        //     let tab = [];
-        //     for (let i = 0; i < 8; i++) tab = tab.concat(rgba); // 8 sommets
-        //     objgl.bindBuffer(objgl.ARRAY_BUFFER, obj);
-        //     objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tab), objgl.STATIC_DRAW);
-        //     return obj;
-        // }
 
         // Relier un texel à un vertex
         function creerTexelsCube(objgl) {
@@ -399,21 +478,6 @@
             return objMaillageCube;
         }
 
-        // function creerPlan(objgl) {
-        //     let obj = objgl.createBuffer();
-
-        //     let tab = [
-        //         -1, 0, -1,
-        //         1, 0, -1,
-        //         1, 0, 1,
-        //         -1, 0, 1
-        //     ];
-
-        //     objgl.bindBuffer(objgl.ARRAY_BUFFER, obj);
-        //     objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tab), objgl.STATIC_DRAW);
-
-        //     return obj;
-        // }
 
         function creerCouleursBuffer(objgl, rgba, nbSommets) {
             let buf = objgl.createBuffer();
@@ -428,40 +492,6 @@
 
             return buf;
         }
-
-        // function creerCouleursPlancher(objgl) {
-        //     let obj = objgl.createBuffer();
-
-        //     let tab = [];
-        //     for (let i = 0; i < 4; i++) {
-        //         tab = tab.concat([1.0, 0.0, 0.0, 1.0]); // rouge
-        //     }
-
-        //     objgl.bindBuffer(objgl.ARRAY_BUFFER, obj);
-        //     objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tab), objgl.STATIC_DRAW);
-
-        //     return obj;
-        // }
-
-        // Plancher générique avec une couleur RGBA
-        // function creerCouleursPlan(objgl, rgba) {
-        //     let obj = objgl.createBuffer();
-        //     let tab = [];
-        //     for (let i = 0; i < 4; i++) tab = tab.concat(rgba);
-        //     objgl.bindBuffer(objgl.ARRAY_BUFFER, obj);
-        //     objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tab), objgl.STATIC_DRAW);
-        //     return obj;
-        // }
-
-        // Cube avec une couleur RGBA uniforme
-        // function creerCouleursCube(objgl, rgba) {
-        //     let obj = objgl.createBuffer();
-        //     let tab = [];
-        //     for (let i = 0; i < 10; i++) tab = tab.concat(rgba);
-        //     objgl.bindBuffer(objgl.ARRAY_BUFFER, obj);
-        //     objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tab), objgl.STATIC_DRAW);
-        //     return obj;
-        // }
 
         function creerCubeColoré(objgl, rgba) {
             let objet3D = new Object();
