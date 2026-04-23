@@ -127,15 +127,15 @@
             // ── CAMÉRA ─────────────────────────────────────────────────────
             var camera = creerCamera();
 
-            setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); // centre de l'enclos
-            setCiblesCameraXYZ([15.5, 0.5, 16.5], camera);    // regarde vers le nord (Z diminue)
+            setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); 
+            setCiblesCameraXYZ([15.5, 0.5, 16.5], camera);    
             setOrientationsXYZ([0, 1, 0], camera);
             objScene3D.camera = camera;
 
-            setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
-            setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
-            setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
-            objScene3D.camera = camera;
+            // setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
+            // setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
+            // setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
+            // objScene3D.camera = camera;
 
             // ── FLÈCHE ─────────────────────────────────────────────────────
             var fleche = creerFleche(objgl, [1.0, 0.84, 0.0, 1.0]);

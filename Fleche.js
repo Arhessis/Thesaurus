@@ -129,8 +129,8 @@ function mettreAJourFleche(objScene3D) {
     let normZ = dirZ / distance;
 
     // 5. Define offsets: how far forward and how high above the player
-    let offsetAvant = 1.5; // 1 unit in front of the camera
-    let offsetHaut = 0.4;  // 0.4 units above the camera's eye level
+    let offsetAvant = 1.1; // 1 unit in front of the camera
+    let offsetHaut = 0.2;  // 0.4 units above the camera's eye level
 
     // 6. Calculate new position
     let flecheX = camX + (normX * offsetAvant);
