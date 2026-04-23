@@ -120,34 +120,34 @@
 
             setPositionsXYZ([randomXTresor, 0, randomZTresor], tresor.transformations);
             setEchellesXYZ([0.7, 0.4, 0.4], tresor.transformations);
+
+            objScene3D.tresor = tresor;
             tabObjets3D.push(tresor);
 
             // ── CAMÉRA ─────────────────────────────────────────────────────
             var camera = creerCamera();
 
             setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); // centre de l'enclos
-            setCiblesCameraXYZ([15.5, 0.5, 14.5], camera);    // regarde vers le nord (Z diminue)
+            setCiblesCameraXYZ([15.5, 0.5, 16.5], camera);    // regarde vers le nord (Z diminue)
             setOrientationsXYZ([0, 1, 0], camera);
             objScene3D.camera = camera;
 
-            // setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
-            // setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
-            // setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
-            // objScene3D.camera = camera;
+            setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
+            setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
+            setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
+            objScene3D.camera = camera;
 
-            return objScene3D;
+            // ── FLÈCHE ─────────────────────────────────────────────────────
+            var fleche = creerFleche(objgl, [1.0, 0.84, 0.0, 1.0]);
 
-            // ── Flèche ─────────────────────────────────────────────────────
-            var fleche = creerFleche(objgl, [1.0, 1.0, 1.0, 1.0]);
-
-            let flecheX = getPositionCameraX(camera);
-            let flecheY = getPositionCameraY(camera) - 0.5; // Positionner la flèche légèrement au-dessus de la caméra
-            let flecheZ = getPositionCameraZ(camera) + 0.5; // Positionner la flèche légèrement devant la caméra
-
-            setPositionsXYZ([flecheX, flecheY, flecheZ], fleche.transformations);
-            setEchellesXYZ([0.7, 0.4, 0.4], fleche.transformations);
+            setEchellesXYZ([0.2, 0.2, 0.2], fleche.transformations);
+            objScene3D.fleche = fleche;
             tabObjets3D.push(fleche);
 
+            mettreAJourFleche(objScene3D);
+
+
+            return objScene3D;
         }
 
         function dessiner(objgl, objProgShaders, objScene3D) {
@@ -274,19 +274,19 @@
         }
 
 
-function placerLigneMiroirY(dedale, x, y, length, type, direction) {
-    let taille = dedale.length;
+        function placerLigneMiroirY(dedale, x, y, length, type, direction) {
+            let taille = dedale.length;
 
-    let newX;
+            let newX;
 
-    if (direction === "h") {
-        newX = taille - 1 - x - (length - 1);
-    } else {
-        newX = taille - 1 - x;
-    }
+            if (direction === "h") {
+                newX = taille - 1 - x - (length - 1);
+            } else {
+                newX = taille - 1 - x;
+            }
 
-    placerLigne(dedale, newX, y, length, type, direction);
-}
+            placerLigne(dedale, newX, y, length, type, direction);
+        }
 
         function creerDedale(taille) {
             let dedale = [];
@@ -387,13 +387,13 @@ function placerLigneMiroirY(dedale, x, y, length, type, direction) {
             placerLigne(dedale, 14, 8, 4, MUR_OUVRABLE, "v");
             placerLigne(dedale, 13, 8, 2, MUR_OUVRABLE, "h");
             placerLigne(dedale, 13, 6, 3, MUR_OUVRABLE, "v");
-            
+
             placerLigne(dedale, 11, 6, 3, MUR_OUVRABLE, "h");
             placerLigne(dedale, 11, 4, 3, MUR_OUVRABLE, "v");
             placerLigne(dedale, 9, 4, 3, MUR_OUVRABLE, "h");
             placerLigne(dedale, 9, 2, 3, MUR_OUVRABLE, "v");
             placerLigne(dedale, 11, 8, 2, MUR_OUVRABLE, "v");
-            
+
 
             placerLigne(dedale, 15, 6, 1, MUR_OUVRABLE, "h");
 
@@ -452,7 +452,7 @@ function placerLigneMiroirY(dedale, x, y, length, type, direction) {
             return buf;
         }
 
-        
+
 
         // function creerCube(objgl) {
         //     var objCube = objgl.createBuffer();
@@ -621,6 +621,8 @@ function placerLigneMiroirY(dedale, x, y, length, type, direction) {
                         setCibleCameraY(getCibleCameraY(camera) + intDirection * 0.2, camera);
                         setPositionCameraY(getPositionCameraY(camera) + intDirection * 0.2, camera);
                     }
+
+            mettreAJourFleche(objScene3D);
 
             effacerCanevas(objgl);
             dessiner(objgl, objProgShaders, objScene3D);
