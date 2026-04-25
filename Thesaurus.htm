@@ -14,7 +14,7 @@
     <script type="text/javascript" src="Camera.js"></script>
     <script type="text/javascript" src="Textures.js"></script>
     <script type="text/javascript" src="Tresor.js"></script>
-    <script type="text/javascript" src="Fleche.js"></script>
+    <script type="text/javascript" src="Fleches.js"></script>
 
     <script type="text/javascript">
 
@@ -127,8 +127,8 @@
             // ── CAMÉRA ─────────────────────────────────────────────────────
             var camera = creerCamera();
 
-            setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); 
-            setCiblesCameraXYZ([15.5, 0.5, 16.5], camera);    
+            setPositionsCameraXYZ([15.5, 0.5, 15.5], camera);
+            setCiblesCameraXYZ([15.5, 0.5, 16.5], camera);
             setOrientationsXYZ([0, 1, 0], camera);
             objScene3D.camera = camera;
 
@@ -137,14 +137,34 @@
             // setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
             // objScene3D.camera = camera;
 
-            // ── FLÈCHE ─────────────────────────────────────────────────────
-            var fleche = creerFleche(objgl, [1.0, 0.84, 0.0, 1.0]);
+            // ── FLÈCHES ─────────────────────────────────────────────────────
+            objScene3D.tabFleches = [];
+            let nbFleches = 18;         
 
-            setEchellesXYZ([0.2, 0.2, 0.2], fleche.transformations);
-            objScene3D.fleche = fleche;
-            tabObjets3D.push(fleche);
+            for (let i = 0; i < nbFleches; i++) {
+                var fleche = creerFleche(objgl, [1.0, 0.84, 0.0, 1.0]);
+                setEchellesXYZ([0.2, 0.2, 0.2], fleche.transformations);
 
-            mettreAJourFleche(objScene3D);
+                let randomX, randomZ;
+                let celluleValide = false;
+
+                while (!celluleValide) {
+                    randomX = Math.floor(Math.random() * TAILLE_DEDALE);
+                    randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
+
+                    if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
+                        !(randomX === randomXTresor && randomZ === randomZTresor)) {
+                        celluleValide = true;
+                    }
+                }
+
+                setPositionsXYZ([randomX, 0.6, randomZ], fleche.transformations);
+
+                objScene3D.tabFleches.push(fleche);
+                tabObjets3D.push(fleche);
+            }
+
+            pointeVersTresor(objScene3D);
 
 
             return objScene3D;
@@ -622,7 +642,6 @@
                         setPositionCameraY(getPositionCameraY(camera) + intDirection * 0.2, camera);
                     }
 
-            mettreAJourFleche(objScene3D);
 
             effacerCanevas(objgl);
             dessiner(objgl, objProgShaders, objScene3D);

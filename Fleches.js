@@ -3,7 +3,6 @@ function creerFleche(objgl, rgba) {
 
     objet3D.vertex = creerGeometrieFleche(objgl);
 
-    // A pyramid uses 16 vertices for independent faces, so change this from 8 to 16
     objet3D.couleurs = creerCouleursBuffer(objgl, rgba, 40);
     objet3D.maillage = creerMaillageFleche(objgl);
     objet3D.transformations = creerTransformations();
@@ -68,7 +67,6 @@ function creerMaillageFleche(objgl) {
     objgl.bindBuffer(objgl.ELEMENT_ARRAY_BUFFER, buf);
     objgl.bufferData(objgl.ELEMENT_ARRAY_BUFFER, new Uint16Array(tabMaillage), objgl.STATIC_DRAW);
 
-    // The pyramid has 6 triangles total
     buf.intNbTriangles = 18;
     buf.intNbDroites = 0;
 
@@ -76,69 +74,26 @@ function creerMaillageFleche(objgl) {
 }
 
 function pointeVersTresor(objScene3D) {
-    let fleche = objScene3D.fleche;
     let tresor = objScene3D.tresor;
+    let tabFleches = objScene3D.tabFleches;
 
-    // Check to ensure both objects exist before doing math
-    if (!fleche || !tresor) return;
+    if (!tresor || !tabFleches) return;
 
-    // 1. Get the arrow's world position
-    let flecheX = getPositionX(fleche.transformations);
-    let flecheZ = getPositionZ(fleche.transformations);
-
-    // 2. Get the treasure's world position
     let tresorX = getPositionX(tresor.transformations);
     let tresorZ = getPositionZ(tresor.transformations);
 
-    // 3. Calculate the difference (the distance vector between them)
-    let dx = tresorX - flecheX;
-    let dz = tresorZ - flecheZ;
+    for (let i = 0; i < tabFleches.length; i++) {
+        let fleche = tabFleches[i];
 
-    // 4. Calculate the angle in radians using Math.atan2
-    // Math.atan2(dx, dz) gives the exact angle relative to the Z-axis
-    let angleRadian = Math.atan2(dx, dz);
+        let flecheX = getPositionX(fleche.transformations);
+        let flecheZ = getPositionZ(fleche.transformations);
 
-    // 5. Convert the radians to degrees (which setAngleY expects)
-    let angleDegre = angleRadian * (180 / Math.PI);
+        let dx = tresorX - flecheX;
+        let dz = tresorZ - flecheZ;
 
-    // 6. Apply the rotation to the arrow
-    setAngleY(angleDegre, fleche.transformations);
-}
+        let angleRadian = Math.atan2(dx, dz);
+        let angleDegre = angleRadian * (180 / Math.PI);
 
-
-function mettreAJourFleche(objScene3D) {
-    let camera = objScene3D.camera;
-    let fleche = objScene3D.fleche;
-
-    // 1. Get current camera position
-    let camX = getPositionCameraX(camera);
-    let camY = getPositionCameraY(camera);
-    let camZ = getPositionCameraZ(camera);
-
-    // 2. Get the target the camera is looking at
-    let cibleX = getCibleCameraX(camera);
-    let cibleZ = getCibleCameraZ(camera);
-
-    // 3. Calculate the direction vector
-    let dirX = cibleX - camX;
-    let dirZ = cibleZ - camZ;
-
-    // 4. Normalize the vector (make its length exactly 1)
-    let distance = Math.sqrt(dirX * dirX + dirZ * dirZ);
-    let normX = dirX / distance;
-    let normZ = dirZ / distance;
-
-    // 5. Define offsets: how far forward and how high above the player
-    let offsetAvant = 1.1; // 1 unit in front of the camera
-    let offsetHaut = 0.2;  // 0.4 units above the camera's eye level
-
-    // 6. Calculate new position
-    let flecheX = camX + (normX * offsetAvant);
-    let flecheY = camY + offsetHaut;
-    let flecheZ = camZ + (normZ * offsetAvant);
-
-    // Apply the new position
-    setPositionsXYZ([flecheX, flecheY, flecheZ], fleche.transformations);
-
-    pointeVersTresor(objScene3D);
+        setAngleY(angleDegre, fleche.transformations);
+    }
 }
