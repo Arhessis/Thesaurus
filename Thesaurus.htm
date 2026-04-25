@@ -132,14 +132,9 @@
             setOrientationsXYZ([0, 1, 0], camera);
             objScene3D.camera = camera;
 
-            // setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
-            // setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
-            // setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
-            // objScene3D.camera = camera;
-
             // ── FLÈCHES ─────────────────────────────────────────────────────
             objScene3D.tabFleches = [];
-            let nbFleches = 18;         
+            let nbFleches = 18;
 
             for (let i = 0; i < nbFleches; i++) {
                 var fleche = creerFleche(objgl, [1.0, 0.84, 0.0, 1.0]);
@@ -635,11 +630,16 @@
                     setPositionCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
                 }
                 else
-                    if (event.keyCode == 33 || event.keyCode == 34) {
-                        // 33: Page Up; 34: Page Down
-                        var intDirection = (event.keyCode == 33) ? 1 : -1;
-                        setCibleCameraY(getCibleCameraY(camera) + intDirection * 0.2, camera);
-                        setPositionCameraY(getPositionCameraY(camera) + intDirection * 0.2, camera);
+                    if (event.keyCode == 33) {
+                        setPositionsCameraXYZ([15.5, 50, 15.5], camera);   
+                        setCiblesCameraXYZ([15.5, 0, 15.5], camera);  
+                        setOrientationsXYZ([0, 0, 1], camera);
+                        objScene3D.camera = camera;
+                    } else if (event.keyCode == 34) {
+                        setPositionsCameraXYZ([15.5, 0.5, 15.5], camera);
+                        setCiblesCameraXYZ([15.5, 0.5, 16.5], camera);
+                        setOrientationsXYZ([0, 1, 0], camera); 
+                        objScene3D.camera = camera;
                     }
 
 
