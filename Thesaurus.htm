@@ -137,8 +137,10 @@
 
             } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR);
 
-            setPositionsXYZ([randomXTresor, 0, randomZTresor], tresor.transformations);
+            setPositionsXYZ([randomXTresor + 0.15, 0, randomZTresor + 0.3], tresor.transformations);
             setEchellesXYZ([0.7, 0.4, 0.4], tresor.transformations);
+
+            objScene3D.tresor = tresor;
             tabObjets3D.push(tresor);
 
             // ── CAMÉRA ─────────────────────────────────────────────────────
@@ -728,7 +730,7 @@
     <footer class="sLargeurDiv sPiedDePage">
         <p>
             <a href="http://www.cgodin.qc.ca">
-                <img src="logoCGG.jpg" alt="logoCGG" />
+                <img src="./Images/logoCGG.jpg" alt="logoCGG" />
             </a>
             <a href="http://www.cgodin.qc.ca/programme/techniques-informatique/">
                 Département d'informatique du Cégep Gérald-Godin
