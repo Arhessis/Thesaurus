@@ -24,16 +24,27 @@ function creerTextures(objgl, tabImages) {
                 objgl.bindTexture(objgl.TEXTURE_2D, objTexture);
                 objgl.texImage2D(objgl.TEXTURE_2D, 0, objgl.RGBA, objgl.RGBA, objgl.UNSIGNED_BYTE, objImage);
 
-                // La param�trer
-                //texture plus grande que defini (étiré), fussionne les pixels
+                // La paramétrer
                 objgl.texParameteri(objgl.TEXTURE_2D, objgl.TEXTURE_MAG_FILTER, objgl.LINEAR);
-                //texture plus petite que defini (plus loin), cré des versions plus petites de l'image
-                objgl.texParameteri(objgl.TEXTURE_2D, objgl.TEXTURE_MIN_FILTER, objgl.LINEAR_MIPMAP_LINEAR);
-                objgl.texParameteri(objgl.TEXTURE_2D, objgl.TEXTURE_WRAP_S, objgl.REPEAT);
-                objgl.texParameteri(objgl.TEXTURE_2D, objgl.TEXTURE_WRAP_T, objgl.REPEAT);
 
-                // Générer les mipmaps (obligatoire pour que MIN_FILTER fonctionne)
-                objgl.generateMipmap(objgl.TEXTURE_2D);
+                var largeur = objImage.width;
+                var hauteur = objImage.height;
+                var puissanceDeux = function(valeur) {
+                    return (valeur & (valeur - 1)) === 0;
+                };
+
+                if (puissanceDeux(largeur) && puissanceDeux(hauteur)) {
+                    // Texture Power-Of-Two : on peut répéter et générer des mipmaps
+                    objgl.texParameteri(objgl.TEXTURE_2D, objgl.TEXTURE_MIN_FILTER, objgl.LINEAR_MIPMAP_LINEAR);
+                    objgl.texParameteri(objgl.TEXTURE_2D, objgl.TEXTURE_WRAP_S, objgl.REPEAT);
+                    objgl.texParameteri(objgl.TEXTURE_2D, objgl.TEXTURE_WRAP_T, objgl.REPEAT);
+                    objgl.generateMipmap(objgl.TEXTURE_2D);
+                } else {
+                    // Texture non-power-of-two : ne pas générer de mipmaps, utiliser clamp-to-edge
+                    objgl.texParameteri(objgl.TEXTURE_2D, objgl.TEXTURE_MIN_FILTER, objgl.LINEAR);
+                    objgl.texParameteri(objgl.TEXTURE_2D, objgl.TEXTURE_WRAP_S, objgl.CLAMP_TO_EDGE);
+                    objgl.texParameteri(objgl.TEXTURE_2D, objgl.TEXTURE_WRAP_T, objgl.CLAMP_TO_EDGE);
+                }
 
                 // Ajouter la texture à l’index correct
                 tabObjTextures[i] = objTexture;

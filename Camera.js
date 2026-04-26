@@ -1,7 +1,7 @@
-// Librairie sur la caméra
+// Librairie sur la camï¿½ra
 
-    // Pour créer une caméra
-    // Au point de départ, le transformations sont neutres.
+    // Pour crï¿½er une camï¿½ra
+    // Au point de dï¿½part, le transformations sont neutres.
     function creerCamera() {
       var tabCamera = [0, 0, 1, 0, 0, 0, 0, 1, 0];
       return tabCamera;
@@ -27,22 +27,22 @@
       return tabCamera[2];
   }
 
-  // Pour aller chercher les position ciblées 
+  // Pour aller chercher les position ciblï¿½es 
   function getCiblesCameraXYZ(tabCamera) {
       return tabCamera.slice(3, 6);
   }
 
- // Pour aller chercher la position ciblée en X 
+ // Pour aller chercher la position ciblï¿½e en X 
   function getCibleCameraX(tabCamera) {
       return tabCamera[3];
   }
 
-  // Pour aller chercher la position ciblée en X
+  // Pour aller chercher la position ciblï¿½e en X
   function getCibleCameraY(tabCamera) {
     return tabCamera[4];
   }
 
-  // Pour aller chercher la position ciblée en X
+  // Pour aller chercher la position ciblï¿½e en X
   function getCibleCameraZ(tabCamera) {
     return tabCamera[5];
  }
@@ -87,22 +87,22 @@
       tabCamera[2] = fltZ;
   }
 
-  // Pour modifier les positions ciblées 
+  // Pour modifier les positions ciblï¿½es 
   function setCiblesCameraXYZ(tabXYZ, tabCamera) {
       tabCamera.splice(3, 3, tabXYZ[0], tabXYZ[1], tabXYZ[2]);
   }
 
-  // Pour modifier la position ciblée en X 
+  // Pour modifier la position ciblï¿½e en X 
   function setCibleCameraX(fltX, tabCamera) {
       tabCamera[3] = fltX;
   }
 
-  // Pour modifier la position ciblée en Y 
+  // Pour modifier la position ciblï¿½e en Y 
   function setCibleCameraY(fltY, tabCamera) {
       tabCamera[4] = fltY;  
     }
 
-  // Pour modifier la position ciblée en Z
+  // Pour modifier la position ciblï¿½e en Z
   function setCibleCameraZ(fltZ, tabCamera) {
       tabCamera[5] = fltZ;
   }
@@ -126,3 +126,45 @@
   function setOrientationZ(fltOrientationZ, tabCamera) {
       tabCamera[8] = fltOrientationZ;
   }
+
+  function deplacerCamera() {
+            var camera = objScene3D.camera;
+
+            if (event.keyCode == 37 || event.keyCode == 39) {
+                // 37:  FlÃ¨che-Ã -gauche; 39:FlÃ¨che-Ã -droite
+                var fltX = getCibleCameraX(camera) - getPositionCameraX(camera);
+                var fltZ = getCibleCameraZ(camera) - getPositionCameraZ(camera);
+                var intDirection = (event.keyCode == 37) ? -1 : 1;
+                var fltAngle = intDirection * Math.PI / 90; // Tourner 2 degrÃ©s
+                var fltXPrime = fltX * Math.cos(fltAngle) - fltZ * Math.sin(fltAngle);
+                var fltZPrime = fltX * Math.sin(fltAngle) + fltZ * Math.cos(fltAngle);
+                setCibleCameraX(getPositionCameraX(camera) + fltXPrime, camera);
+                setCibleCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
+            }
+            else
+                if (event.keyCode == 38 || event.keyCode == 40) {
+                    // 38:  FlÃ¨che-en-haut; 40:FlÃ¨che-en-bas
+                    var fltX = getCibleCameraX(camera) - getPositionCameraX(camera);
+                    var fltZ = getCibleCameraZ(camera) - getPositionCameraZ(camera);
+                    var fltRayon = Math.sqrt(fltX * fltX + fltZ * fltZ);
+                    var intDirection = (event.keyCode == 38) ? 1 : -1;
+
+                    var fltXPrime = intDirection * 0.2 * Math.cos(Math.acos(fltX / fltRayon));
+                    var fltZPrime = intDirection * 0.2 * Math.sin(Math.asin(fltZ / fltRayon));
+
+                    setCibleCameraX(getCibleCameraX(camera) + fltXPrime, camera);
+                    setCibleCameraZ(getCibleCameraZ(camera) + fltZPrime, camera);
+                    setPositionCameraX(getPositionCameraX(camera) + fltXPrime, camera);
+                    setPositionCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
+                }
+                else
+                    if (event.keyCode == 33 || event.keyCode == 34) {
+                        // 33: Page Up; 34: Page Down
+                        var intDirection = (event.keyCode == 33) ? 1 : -1;
+                        setCibleCameraY(getCibleCameraY(camera) + intDirection * 0.2, camera);
+                        setPositionCameraY(getPositionCameraY(camera) + intDirection * 0.2, camera);
+                    }
+
+            effacerCanevas(objgl);
+            dessiner(objgl, objProgShaders, objScene3D);
+        }

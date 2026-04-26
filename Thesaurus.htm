@@ -7,17 +7,36 @@
     <title>Thesaurus</title>
     <link rel="stylesheet" type="text/css" href="StyleLabo14.css" />
 
-    <script type="text/javascript" src="WebGl.js"></script>
-    <script type="text/javascript" src="ShaderCouleursTextures.js"></script>
-    <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
-    <script type="text/javascript" src="Transformations.js"></script>
-    <script type="text/javascript" src="Camera.js"></script>
-    <script type="text/javascript" src="Textures.js"></script>
-    <script type="text/javascript" src="Tresor.js"></script>
-    <script type="text/javascript" src="Fleche.js"></script>
+    <script src="WebGl.js"></script>
+    <script src="ShaderCouleursTextures.js"></script>
+    <script src="glMatrix-0.9.5.min.js"></script>
+    <script src="Transformations.js"></script>
+    <script src="Camera.js"></script>
+    <script src="Textures.js"></script>
+    <script src="Dedale.js"></script>
+    <script src="Objets3D.js"></script>
+    <script src="Dessin.js"></script>
+    <script src="Tresor.js"></script>
+    <script src="Fleche.js"></script>
 
-    <script type="text/javascript">
 
+    <!-- <script type="text/javascript">
+
+        // var objgl = null;
+        // var objProgShaders = null;
+        // var objScene3D = null;
+
+        // var TEX_TRANSPARENT = 0;
+        // var TEX_PIERRES = 1;
+        // var TEX_TRESOR = 2;
+
+        // // ── Types de cellules du dédale ────────────────────────────────
+        // const COULOIR = 0;  // cellule vide, le joueur peut y circuler
+        // const MUR_FIXE = 1;  // mur non ouvrable (bordures, obstacles permanents)
+        // const MUR_OUVRABLE = 2;  // mur ouvrable par un ouvreur de murs
+        // const ENCLOS = 3;  // zone de départ du joueur au centre
+
+        // const TAILLE_DEDALE = 31;
         var objgl = null;
         var objProgShaders = null;
         var objScene3D = null;
@@ -25,14 +44,7 @@
         var TEX_TRANSPARENT = 0;
         var TEX_PIERRES = 1;
         var TEX_TRESOR = 2;
-
-        // ── Types de cellules du dédale ────────────────────────────────
-        const COULOIR = 0;  // cellule vide, le joueur peut y circuler
-        const MUR_FIXE = 1;  // mur non ouvrable (bordures, obstacles permanents)
-        const MUR_OUVRABLE = 2;  // mur ouvrable par un ouvreur de murs
-        const ENCLOS = 3;  // zone de départ du joueur au centre
-
-        const TAILLE_DEDALE = 31;
+        var TEX_CIEL = 3;
 
         async function demarrer() {
             var objCanvas = document.getElementById('monCanvas');
@@ -51,7 +63,7 @@
 
             objScene3D.dedale = creerDedale(31);
 
-            objScene3D.textures = await creerTextures(objgl, ['Transparent.gif', 'Pierres.jpg', 'coffre.jpg']);
+            objScene3D.textures = await creerTextures(objgl, ['Transparent.gif', 'Pierres.jpg', 'coffre.jpg', "Cloudy_sky.png"]);
 
             // ── PLANCHER COULOIRS ──────────────────────────
             let plancherCouloir = new Object();
@@ -81,6 +93,13 @@
             setEchellesXYZ([1.5, 1, 1.5], plancherEnclos.transformations);
 
             tabObjets3D.push(plancherEnclos);
+
+            // ── PLAFOND ────────────────────────────────────────────────
+            let plafond = creerPlanTexturé(objgl, TEX_CIEL, 1.0);
+            setPositionsXYZ([15.5, HAUTEUR_PLAFOND, 15.5], plafond.transformations);
+            setEchellesXYZ([15.5, 1, 15.5], plafond.transformations);
+            setAngleX(180, plafond.transformations); // retourner pour regarder vers le bas
+            tabObjets3D.push(plafond);
 
             // ── MURS ───────────────────────────────────────────────────────
             for (let i = 0; i < TAILLE_DEDALE; i++) {
@@ -125,17 +144,17 @@
             // ── CAMÉRA ─────────────────────────────────────────────────────
             var camera = creerCamera();
 
-            setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); // centre de l'enclos
-            setCiblesCameraXYZ([15.5, 0.5, 14.5], camera);    // regarde vers le nord (Z diminue)
-            setOrientationsXYZ([0, 1, 0], camera);
-            objScene3D.camera = camera;
-
-            // setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
-            // setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
-            // setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
+            // setPositionsCameraXYZ([15.5, 0.5, 15.5], camera); // centre de l'enclos
+            // setCiblesCameraXYZ([15.5, 0.5, 14.5], camera);    // regarde vers le nord (Z diminue)
+            // setOrientationsXYZ([0, 1, 0], camera);
             // objScene3D.camera = camera;
 
-            return objScene3D;
+            setPositionsCameraXYZ([15.5, 50, 15.5], camera);    // Positioned directly above center
+            setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
+            setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
+            objScene3D.camera = camera;
+
+            //return objScene3D;
 
             // ── Flèche ─────────────────────────────────────────────────────
             var fleche = creerFleche(objgl, [1.0, 1.0, 1.0, 1.0]);
@@ -148,482 +167,543 @@
             setEchellesXYZ([0.7, 0.4, 0.4], fleche.transformations);
             tabObjets3D.push(fleche);
 
+            return objScene3D;
+
         }
 
-        function dessiner(objgl, objProgShaders, objScene3D) {
-            // La vue
-            objgl.viewport(0, 0, objgl.drawingBufferWidth, objgl.drawingBufferHeight);
+        // function dessiner(objgl, objProgShaders, objScene3D) {
+        //     // La vue
+        //     objgl.viewport(0, 0, objgl.drawingBufferWidth, objgl.drawingBufferHeight);
 
-            // Matrice de projection
-            var matProjection = mat4.create();
-            var fltRapportCanevas = objgl.drawingBufferWidth / objgl.drawingBufferHeight;
-            mat4.perspective(45, fltRapportCanevas, 0.01, 100, matProjection);
-            //mat4.perspective(80, fltRapportCanevas, 0.01, 1000, matProjection);
+        //     // Matrice de projection
+        //     var matProjection = mat4.create();
+        //     var fltRapportCanevas = objgl.drawingBufferWidth / objgl.drawingBufferHeight;
+        //     mat4.perspective(45, fltRapportCanevas, 0.01, 100, matProjection);
+        //     //mat4.perspective(80, fltRapportCanevas, 0.01, 1000, matProjection);
 
-            // Relier la matrice aux shaders
-            objgl.uniformMatrix4fv(objProgShaders.matProjection, false, matProjection);
+        //     // Relier la matrice aux shaders
+        //     objgl.uniformMatrix4fv(objProgShaders.matProjection, false, matProjection);
 
-            for (var i = 0; i < objScene3D.tabObjets3D.length; i++) {
-                var vertex = objScene3D.tabObjets3D[i].vertex;
-                var couleurs = objScene3D.tabObjets3D[i].couleurs;
-                var texels = objScene3D.tabObjets3D[i].texels;
-                var maillage = objScene3D.tabObjets3D[i].maillage;
-                var transformations = objScene3D.tabObjets3D[i].transformations;
+        //     for (var i = 0; i < objScene3D.tabObjets3D.length; i++) {
+        //         var vertex = objScene3D.tabObjets3D[i].vertex;
+        //         var couleurs = objScene3D.tabObjets3D[i].couleurs;
+        //         var texels = objScene3D.tabObjets3D[i].texels;
+        //         var maillage = objScene3D.tabObjets3D[i].maillage;
+        //         var transformations = objScene3D.tabObjets3D[i].transformations;
 
-                // Matrice du modèle            
-                var matModeleVue = mat4.create();
-                mat4.identity(matModeleVue);
+        //         // Matrice du modèle
+        //         var matModeleVue = mat4.create();
+        //         mat4.identity(matModeleVue);
 
-                // Placer la caméra sur la scène
-                mat4.lookAt(getPositionsCameraXYZ(objScene3D.camera),
-                    getCiblesCameraXYZ(objScene3D.camera),
-                    getOrientationsXYZ(objScene3D.camera),
-                    matModeleVue);
+        //         // Placer la caméra sur la scène
+        //         mat4.lookAt(getPositionsCameraXYZ(objScene3D.camera),
+        //             getCiblesCameraXYZ(objScene3D.camera),
+        //             getOrientationsXYZ(objScene3D.camera),
+        //             matModeleVue);
 
-                // Appliquer les transformations sur le modèle 
-                mat4.translate(matModeleVue, getPositionsXYZ(transformations));
-                mat4.scale(matModeleVue, getEchellesXYZ(transformations));
-                mat4.rotateX(matModeleVue, getAngleX(transformations) * Math.PI / 180);
-                mat4.rotateY(matModeleVue, getAngleY(transformations) * Math.PI / 180);
-                mat4.rotateZ(matModeleVue, getAngleZ(transformations) * Math.PI / 180);
+        //         // Appliquer les transformations sur le modèle
+        //         mat4.translate(matModeleVue, getPositionsXYZ(transformations));
+        //         mat4.scale(matModeleVue, getEchellesXYZ(transformations));
+        //         mat4.rotateX(matModeleVue, getAngleX(transformations) * Math.PI / 180);
+        //         mat4.rotateY(matModeleVue, getAngleY(transformations) * Math.PI / 180);
+        //         mat4.rotateZ(matModeleVue, getAngleZ(transformations) * Math.PI / 180);
 
-                // Relier la matrice aux shaders
-                objgl.uniformMatrix4fv(objProgShaders.matModeleVue, false, matModeleVue);
+        //         // Relier la matrice aux shaders
+        //         objgl.uniformMatrix4fv(objProgShaders.matModeleVue, false, matModeleVue);
 
-                if (maillage == null && texels == null) {
-                    // Plancher — pas de texture
-                    objgl.disableVertexAttribArray(objProgShaders.posTexel);
+        //         if (maillage == null && texels == null) {
+        //             // Plancher — pas de texture
+        //             objgl.disableVertexAttribArray(objProgShaders.posTexel);
 
-                    objgl.bindBuffer(objgl.ARRAY_BUFFER, vertex);
-                    objgl.vertexAttribPointer(objProgShaders.posVertex, 3, objgl.FLOAT, false, 0, 0);
+        //             objgl.bindBuffer(objgl.ARRAY_BUFFER, vertex);
+        //             objgl.vertexAttribPointer(objProgShaders.posVertex, 3, objgl.FLOAT, false, 0, 0);
 
-                    objgl.bindBuffer(objgl.ARRAY_BUFFER, couleurs);
-                    objgl.vertexAttribPointer(objProgShaders.couleurVertex, 4, objgl.FLOAT, false, 0, 0);
+        //             objgl.bindBuffer(objgl.ARRAY_BUFFER, couleurs);
+        //             objgl.vertexAttribPointer(objProgShaders.couleurVertex, 4, objgl.FLOAT, false, 0, 0);
 
-                    objgl.uniform1i(objProgShaders.noTexture, TEX_TRANSPARENT);
-                    objgl.uniform1f(objProgShaders.pcCouleurTexel, 0.0);
+        //             objgl.uniform1i(objProgShaders.noTexture, TEX_TRANSPARENT);
+        //             objgl.uniform1f(objProgShaders.pcCouleurTexel, 0.0);
 
-                    objgl.drawArrays(vertex.typeDessin, 0, 4);
+        //             objgl.drawArrays(vertex.typeDessin, 0, 4);
 
-                    objgl.enableVertexAttribArray(objProgShaders.posTexel);
-                }
-                else if (maillage != null && texels == null) {
-                    // Cube coloré — pas de texture
-                    objgl.disableVertexAttribArray(objProgShaders.posTexel);
+        //             objgl.enableVertexAttribArray(objProgShaders.posTexel);
+        //         }
+        //         else if (maillage != null && texels == null) {
+        //             // Cube coloré — pas de texture
+        //             objgl.disableVertexAttribArray(objProgShaders.posTexel);
 
-                    objgl.bindBuffer(objgl.ARRAY_BUFFER, vertex);
-                    objgl.vertexAttribPointer(objProgShaders.posVertex, 3, objgl.FLOAT, false, 0, 0);
+        //             objgl.bindBuffer(objgl.ARRAY_BUFFER, vertex);
+        //             objgl.vertexAttribPointer(objProgShaders.posVertex, 3, objgl.FLOAT, false, 0, 0);
 
-                    objgl.bindBuffer(objgl.ARRAY_BUFFER, couleurs);
-                    objgl.vertexAttribPointer(objProgShaders.couleurVertex, 4, objgl.FLOAT, false, 0, 0);
+        //             objgl.bindBuffer(objgl.ARRAY_BUFFER, couleurs);
+        //             objgl.vertexAttribPointer(objProgShaders.couleurVertex, 4, objgl.FLOAT, false, 0, 0);
 
-                    objgl.uniform1i(objProgShaders.noTexture, TEX_TRANSPARENT);
-                    objgl.uniform1f(objProgShaders.pcCouleurTexel, 0.0);
+        //             objgl.uniform1i(objProgShaders.noTexture, TEX_TRANSPARENT);
+        //             objgl.uniform1f(objProgShaders.pcCouleurTexel, 0.0);
 
-                    objgl.bindBuffer(objgl.ELEMENT_ARRAY_BUFFER, maillage);
-                    objgl.drawElements(objgl.TRIANGLES, maillage.intNbTriangles * 3, objgl.UNSIGNED_SHORT, 0);
-                    objgl.drawElements(objgl.LINES, maillage.intNbDroites * 2, objgl.UNSIGNED_SHORT, maillage.intNbTriangles * 2 * 3);
+        //             objgl.bindBuffer(objgl.ELEMENT_ARRAY_BUFFER, maillage);
+        //             objgl.drawElements(objgl.TRIANGLES, maillage.intNbTriangles * 3, objgl.UNSIGNED_SHORT, 0);
+        //             objgl.drawElements(objgl.LINES, maillage.intNbDroites * 2, objgl.UNSIGNED_SHORT, maillage.intNbTriangles * 2 * 3);
 
-                    objgl.enableVertexAttribArray(objProgShaders.posTexel);
-                }
-                else {
-                    // Cube avec texture
-                    objgl.bindBuffer(objgl.ARRAY_BUFFER, vertex);
-                    objgl.vertexAttribPointer(objProgShaders.posVertex, 3, objgl.FLOAT, false, 0, 0);
+        //             objgl.enableVertexAttribArray(objProgShaders.posTexel);
+        //         }
+        //         else {
+        //             // Cube avec texture
+        //             objgl.bindBuffer(objgl.ARRAY_BUFFER, vertex);
+        //             objgl.vertexAttribPointer(objProgShaders.posVertex, 3, objgl.FLOAT, false, 0, 0);
 
-                    objgl.bindBuffer(objgl.ARRAY_BUFFER, couleurs);
-                    objgl.vertexAttribPointer(objProgShaders.couleurVertex, 4, objgl.FLOAT, false, 0, 0);
+        //             objgl.bindBuffer(objgl.ARRAY_BUFFER, couleurs);
+        //             objgl.vertexAttribPointer(objProgShaders.couleurVertex, 4, objgl.FLOAT, false, 0, 0);
 
-                    objgl.activeTexture(objgl.TEXTURE0 + texels.intNoTexture);
-                    objgl.bindTexture(objgl.TEXTURE_2D, objScene3D.textures[texels.intNoTexture]);
+        //             objgl.activeTexture(objgl.TEXTURE0 + texels.intNoTexture);
+        //             objgl.bindTexture(objgl.TEXTURE_2D, objScene3D.textures[texels.intNoTexture]);
 
-                    objgl.bindBuffer(objgl.ARRAY_BUFFER, texels);
-                    objgl.vertexAttribPointer(objProgShaders.posTexel, 2, objgl.FLOAT, false, 0, 0);
+        //             objgl.bindBuffer(objgl.ARRAY_BUFFER, texels);
+        //             objgl.vertexAttribPointer(objProgShaders.posTexel, 2, objgl.FLOAT, false, 0, 0);
 
-                    objgl.uniform1i(objProgShaders.noTexture, texels.intNoTexture);
-                    objgl.uniform1f(objProgShaders.pcCouleurTexel, texels.pcCouleurTexel);
+        //             objgl.uniform1i(objProgShaders.noTexture, texels.intNoTexture);
+        //             objgl.uniform1f(objProgShaders.pcCouleurTexel, texels.pcCouleurTexel);
 
-                    objgl.bindBuffer(objgl.ELEMENT_ARRAY_BUFFER, maillage);
-                    objgl.drawElements(objgl.TRIANGLES, maillage.intNbTriangles * 3, objgl.UNSIGNED_SHORT, 0);
-                    objgl.drawElements(objgl.LINES, maillage.intNbDroites * 2, objgl.UNSIGNED_SHORT, maillage.intNbTriangles * 2 * 3);
-                }
-            }
-        }
-
-        function effacerCanevas(objgl) {
-            // Met la couleur d'effacement au noir et complétement opaque
-            objgl.clearColor(0.0, 0.0, 0.0, 1.0);
-            // Efface les couleurs et le buffer de profondeur.
-            objgl.clear(objgl.COLOR_BUFFER_BIT | objgl.DEPTH_BUFFER_BIT);
-        }
-
-        function setCell(dedale, x, y, type) {
-            if (y >= 0 && y < dedale.length && x >= 0 && x < dedale[0].length) {
-                dedale[y][x] = type;
-            }
-        }
-
-        function placerLigne(dedale, x, y, length, type, direction) {
-            for (let i = 0; i < length; i++) {
-                if (direction === "h") {
-                    setCell(dedale, x + i, y, type);
-                } else {
-                    setCell(dedale, x, y + i, type);
-                }
-            }
-        }
-
-
-function placerLigneMiroirY(dedale, x, y, length, type, direction) {
-    let taille = dedale.length;
-
-    let newX;
-
-    if (direction === "h") {
-        newX = taille - 1 - x - (length - 1);
-    } else {
-        newX = taille - 1 - x;
-    }
-
-    placerLigne(dedale, newX, y, length, type, direction);
-}
-
-        function creerDedale(taille) {
-            let dedale = [];
-
-            // 1. initialize full grid
-            for (let i = 0; i < taille; i++) {
-                dedale[i] = [];
-                for (let j = 0; j < taille; j++) {
-                    dedale[i][j] = COULOIR;
-                }
-            }
-
-            // outer walls
-            placerLigne(dedale, 0, 0, 31, MUR_FIXE, "v");
-            placerLigne(dedale, 1, 0, 30, MUR_FIXE, "h");
-            placerLigne(dedale, 30, 0, 31, MUR_FIXE, "v");
-            placerLigne(dedale, 0, 30, 31, MUR_FIXE, "h");
-
-            //spawn walls
-            placerLigne(dedale, 16, 17, 2, MUR_FIXE, "h");
-            placerLigne(dedale, 13, 17, 2, MUR_FIXE, "h");
-            placerLigne(dedale, 13, 13, 4, MUR_FIXE, "v");
-            placerLigne(dedale, 17, 13, 4, MUR_FIXE, "v");
-            placerLigne(dedale, 14, 13, 4, MUR_FIXE, "h");
-
-            //left section
-            placerLigne(dedale, 23, 28, 6, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 23, 26, 7, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 27, 24, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 23, 24, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 27, 22, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 23, 22, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 23, 20, 6, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 25, 18, 5, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 23, 16, 6, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 23, 17, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 23, 14, 7, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 23, 12, 6, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 28, 8, 4, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 23, 10, 4, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 23, 8, 4, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 26, 9, 1, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 23, 2, 6, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 23, 2, 4, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 26, 2, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 25, 4, 2, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 25, 6, 4, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 28, 2, 2, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 28, 2, 3, MUR_OUVRABLE, "v");
-
-            //center section
-            placerLigne(dedale, 17, 28, 5, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 17, 26, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 21, 26, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 18, 26, 1, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 20, 26, 1, MUR_OUVRABLE, "v");
-
-            placerLigne(dedale, 15, 26, 4, MUR_OUVRABLE, "v");
-
-            placerLigne(dedale, 9, 28, 5, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 9, 26, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 13, 26, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 10, 26, 1, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 12, 26, 1, MUR_OUVRABLE, "v");
-
-            placerLigne(dedale, 21, 19, 6, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 19, 19, 2, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 19, 19, 6, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 17, 19, 6, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 18, 24, 1, MUR_OUVRABLE, "v");
-
-            placerLigne(dedale, 15, 19, 6, MUR_OUVRABLE, "v");
-
-            placerLigne(dedale, 13, 19, 6, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 11, 19, 1, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 12, 24, 1, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 11, 19, 6, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 9, 19, 6, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 10, 19, 1, MUR_OUVRABLE, "v");
-
-            placerLigne(dedale, 21, 6, 12, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 19, 17, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 19, 11, 7, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 16, 11, 4, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 16, 8, 4, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 16, 8, 2, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 17, 6, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 17, 6, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 19, 4, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 19, 4, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 21, 2, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 19, 8, 2, MUR_OUVRABLE, "v");
-
-            placerLigne(dedale, 9, 6, 12, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 11, 11, 7, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 9, 17, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 11, 11, 4, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 14, 8, 4, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 13, 8, 2, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 13, 6, 3, MUR_OUVRABLE, "v");
-            
-            placerLigne(dedale, 11, 6, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 11, 4, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 9, 4, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 9, 2, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 11, 8, 2, MUR_OUVRABLE, "v");
-            
-
-            placerLigne(dedale, 15, 6, 1, MUR_OUVRABLE, "h");
-
-            placerLigne(dedale, 11, 2, 9, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 17, 2, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 13, 2, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 14, 4, 1, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 16, 4, 1, MUR_OUVRABLE, "v");
-
-
-            //right section
-            placerLigne(dedale, 2, 28, 6, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 1, 26, 7, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 1, 24, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 5, 24, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 1, 22, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 5, 22, 3, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 2, 20, 6, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 1, 18, 5, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 2, 16, 6, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 7, 17, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 1, 14, 7, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 2, 12, 6, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 2, 8, 4, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 4, 10, 4, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 4, 8, 4, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 4, 9, 1, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 7, 2, 6, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 4, 2, 4, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 4, 2, 3, MUR_OUVRABLE, "v");
-            placerLigne(dedale, 4, 4, 2, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 2, 6, 4, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 1, 2, 2, MUR_OUVRABLE, "h");
-            placerLigne(dedale, 2, 2, 3, MUR_OUVRABLE, "v");
-
-
-            return dedale;
-        }
-
-        function creerGeometriePlan(objgl) {
-            let buf = objgl.createBuffer();
-            let tab = [-1, 0, -1, 1, 0, -1, 1, 0, 1, -1, 0, 1];
-            objgl.bindBuffer(objgl.ARRAY_BUFFER, buf);
-            objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tab), objgl.STATIC_DRAW);
-            return buf;
-        }
-
-        function creerGeometrieCube(objgl) {
-            let buf = objgl.createBuffer();
-            let tab = [
-                0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0,  // face avant
-                0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1   // face arrière
-            ];
-            objgl.bindBuffer(objgl.ARRAY_BUFFER, buf);
-            objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tab), objgl.STATIC_DRAW);
-            return buf;
-        }
-
-        
-
-        // function creerCube(objgl) {
-        //     var objCube = objgl.createBuffer();
-
-        //     var tabVertex = [
-        //         // 8 coins du cube
-        //         0.0, 0.0, 0.0,  // 0: avant-bas-gauche
-        //         1.0, 0.0, 0.0,  // 1: avant-bas-droit
-        //         1.0, 1.0, 0.0,  // 2: avant-haut-droit
-        //         0.0, 1.0, 0.0,  // 3: avant-haut-gauche
-        //         0.0, 0.0, 1.0,  // 4: arrière-bas-gauche
-        //         1.0, 0.0, 1.0,  // 5: arrière-bas-droit
-        //         1.0, 1.0, 1.0,  // 6: arrière-haut-droit
-        //         0.0, 1.0, 1.0   // 7: arrière-haut-gauche
-        //     ];
-
-        //     objgl.bindBuffer(objgl.ARRAY_BUFFER, objCube);
-        //     objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tabVertex), objgl.STATIC_DRAW);
-
-        //     return objCube;
+        //             objgl.bindBuffer(objgl.ELEMENT_ARRAY_BUFFER, maillage);
+        //             objgl.drawElements(objgl.TRIANGLES, maillage.intNbTriangles * 3, objgl.UNSIGNED_SHORT, 0);
+        //             objgl.drawElements(objgl.LINES, maillage.intNbDroites * 2, objgl.UNSIGNED_SHORT, maillage.intNbTriangles * 2 * 3);
+        //         }
+        //     }
         // }
 
-        // function creerCouleursCube(objgl, rgba) {
-        //     let obj = objgl.createBuffer();
-        //     let tab = [];
-        //     for (let i = 0; i < 8; i++) tab = tab.concat(rgba); // 8 sommets
-        //     objgl.bindBuffer(objgl.ARRAY_BUFFER, obj);
+        // function effacerCanevas(objgl) {
+        //     // Met la couleur d'effacement au noir et complétement opaque
+        //     objgl.clearColor(0.0, 0.0, 0.0, 1.0);
+        //     // Efface les couleurs et le buffer de profondeur.
+        //     objgl.clear(objgl.COLOR_BUFFER_BIT | objgl.DEPTH_BUFFER_BIT);
+        // }
+
+        // function setCell(dedale, x, y, type) {
+        //     if (y >= 0 && y < dedale.length && x >= 0 && x < dedale[0].length) {
+        //         dedale[y][x] = type;
+        //     }
+        // }
+
+        // function placerLigne(dedale, x, y, length, type, direction) {
+        //     for (let i = 0; i < length; i++) {
+        //         if (direction === "h") {
+        //             setCell(dedale, x + i, y, type);
+        //         } else {
+        //             setCell(dedale, x, y + i, type);
+        //         }
+        //     }
+        // }
+
+
+
+        // function creerDedale(taille) {
+        //     let dedale = [];
+
+        //     // 1. initialize full grid
+        //     for (let i = 0; i < taille; i++) {
+        //         dedale[i] = [];
+        //         for (let j = 0; j < taille; j++) {
+        //             dedale[i][j] = COULOIR;
+        //         }
+        //     }
+
+        //     // outer walls
+        //     placerLigne(dedale, 0, 0, 31, MUR_FIXE, "v");
+        //     placerLigne(dedale, 1, 0, 30, MUR_FIXE, "h");
+        //     placerLigne(dedale, 30, 0, 31, MUR_FIXE, "v");
+        //     placerLigne(dedale, 0, 30, 31, MUR_FIXE, "h");
+
+        //     //spawn walls
+        //     placerLigne(dedale, 16, 17, 2, MUR_FIXE, "h");
+        //     placerLigne(dedale, 13, 17, 2, MUR_FIXE, "h");
+        //     placerLigne(dedale, 13, 13, 4, MUR_FIXE, "v");
+        //     placerLigne(dedale, 17, 13, 4, MUR_FIXE, "v");
+        //     placerLigne(dedale, 14, 13, 4, MUR_FIXE, "h");
+
+        //     //left section
+        //     placerLigne(dedale, 23, 28, 6, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 23, 26, 7, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 27, 24, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 23, 24, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 27, 22, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 23, 22, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 23, 20, 6, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 25, 18, 5, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 23, 16, 6, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 23, 17, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 23, 14, 7, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 23, 12, 6, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 28, 8, 4, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 23, 10, 4, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 23, 8, 4, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 26, 9, 1, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 23, 2, 6, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 23, 2, 4, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 26, 2, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 25, 4, 2, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 25, 6, 4, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 28, 2, 2, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 28, 2, 3, MUR_OUVRABLE, "v");
+
+        //     //center section
+        //     placerLigne(dedale, 17, 28, 5, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 17, 26, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 21, 26, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 18, 26, 1, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 20, 26, 1, MUR_OUVRABLE, "v");
+
+        //     placerLigne(dedale, 15, 26, 4, MUR_OUVRABLE, "v");
+
+        //     placerLigne(dedale, 9, 28, 5, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 9, 26, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 13, 26, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 10, 26, 1, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 12, 26, 1, MUR_OUVRABLE, "v");
+
+        //     placerLigne(dedale, 21, 19, 6, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 19, 19, 2, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 19, 19, 6, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 17, 19, 6, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 18, 24, 1, MUR_OUVRABLE, "v");
+
+        //     placerLigne(dedale, 15, 19, 6, MUR_OUVRABLE, "v");
+
+        //     placerLigne(dedale, 13, 19, 6, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 11, 19, 1, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 12, 24, 1, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 11, 19, 6, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 9, 19, 6, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 10, 19, 1, MUR_OUVRABLE, "v");
+
+        //     placerLigne(dedale, 21, 6, 12, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 19, 17, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 19, 11, 7, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 16, 11, 4, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 16, 8, 4, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 16, 8, 2, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 17, 6, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 17, 6, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 19, 4, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 19, 4, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 21, 2, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 19, 8, 2, MUR_OUVRABLE, "v");
+
+        //     placerLigne(dedale, 9, 6, 12, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 11, 11, 7, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 9, 17, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 11, 11, 4, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 14, 8, 4, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 13, 8, 2, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 13, 6, 3, MUR_OUVRABLE, "v");
+
+        //     placerLigne(dedale, 11, 6, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 11, 4, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 9, 4, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 9, 2, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 11, 8, 2, MUR_OUVRABLE, "v");
+
+
+        //     placerLigne(dedale, 15, 6, 1, MUR_OUVRABLE, "h");
+
+        //     placerLigne(dedale, 11, 2, 9, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 17, 2, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 13, 2, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 14, 4, 1, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 16, 4, 1, MUR_OUVRABLE, "v");
+
+
+        //     //right section
+        //     placerLigne(dedale, 2, 28, 6, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 1, 26, 7, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 1, 24, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 5, 24, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 1, 22, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 5, 22, 3, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 2, 20, 6, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 1, 18, 5, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 2, 16, 6, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 7, 17, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 1, 14, 7, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 2, 12, 6, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 2, 8, 4, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 4, 10, 4, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 4, 8, 4, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 4, 9, 1, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 7, 2, 6, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 4, 2, 4, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 4, 2, 3, MUR_OUVRABLE, "v");
+        //     placerLigne(dedale, 4, 4, 2, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 2, 6, 4, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 1, 2, 2, MUR_OUVRABLE, "h");
+        //     placerLigne(dedale, 2, 2, 3, MUR_OUVRABLE, "v");
+
+
+        //     return dedale;
+        // }
+
+        // function creerGeometriePlan(objgl) {
+        //     let buf = objgl.createBuffer();
+        //     let tab = [-1, 0, -1, 1, 0, -1, 1, 0, 1, -1, 0, 1];
+        //     objgl.bindBuffer(objgl.ARRAY_BUFFER, buf);
         //     objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tab), objgl.STATIC_DRAW);
-        //     return obj;
+        //     return buf;
         // }
 
-        // Relier un texel à un vertex
-        function creerTexelsCube(objgl) {
-            var objTexelsCube = objgl.createBuffer();
-
-            tabTexels = [  // Texels de la face avant
-                2.0, 1.0,  // 0: Centre
-                4.0, 0.0,  // 1: Coin haut droit
-                4.0, 2.0,  // 2: Coin bas droit
-                0.0, 2.0,  // 3: Coin bas gauche
-                0.0, 0.0,  // 4: Coin haut gauche
-
-                // Texels de la face arrière
-                1.0, 2.0,   // 5: Centre
-                0.0, 0.0,   // 6: Coin haut droit
-                0.0, 4.0,   // 7: Coin bas droit
-                2.0, 4.0,   // 8: Coin bas gauche
-                2.0, 0.0    // 9: Coin haut gauche
-            ];
-
-            objgl.bindBuffer(objgl.ARRAY_BUFFER, objTexelsCube);
-            objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tabTexels), objgl.STATIC_DRAW);
-
-            // 100% de la texture est utilisée
-            objTexelsCube.intNoTexture = TEX_PIERRES; objTexelsCube.pcCouleurTexel = 1.00;
-
-            return objTexelsCube;
-        }
-
-
-        // Le maillage 
-        function creerMaillageCube(objgl) {
-            var objMaillageCube = objgl.createBuffer();
-
-            var tabMaillage = [
-                // Face avant (Z=0)
-                0, 1, 2, 0, 2, 3,
-                // Face arrière (Z=1)
-                5, 4, 7, 5, 7, 6,
-                // Face gauche (X=0)
-                4, 0, 3, 4, 3, 7,
-                // Face droite (X=1)
-                1, 5, 6, 1, 6, 2,
-                // Face haut (Y=1)
-                3, 2, 6, 3, 6, 7,
-                // Face bas (Y=0) — optionnel, collée sur le plancher
-                4, 5, 1, 4, 1, 0
-            ];
-
-            objgl.bindBuffer(objgl.ELEMENT_ARRAY_BUFFER, objMaillageCube);
-            objgl.bufferData(objgl.ELEMENT_ARRAY_BUFFER, new Uint16Array(tabMaillage), objgl.STATIC_DRAW);
-
-            objMaillageCube.intNbTriangles = 12; // 6 faces × 2 triangles
-            objMaillageCube.intNbDroites = 0;    // plus de droites
-
-            return objMaillageCube;
-        }
-
-
-        // function creerPlan(objgl) {
-        //     let obj = objgl.createBuffer();
-
+        // function creerGeometrieCube(objgl) {
+        //     let buf = objgl.createBuffer();
         //     let tab = [
-        //         -1, 0, -1,
-        //         1, 0, -1,
-        //         1, 0, 1,
-        //         -1, 0, 1
+        //         0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0,  // face avant
+        //         0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1   // face arrière
         //     ];
-
-        //     objgl.bindBuffer(objgl.ARRAY_BUFFER, obj);
+        //     objgl.bindBuffer(objgl.ARRAY_BUFFER, buf);
         //     objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tab), objgl.STATIC_DRAW);
-
-        //     return obj;
+        //     return buf;
         // }
 
-        function creerCouleursBuffer(objgl, rgba, nbSommets) {
-            let buf = objgl.createBuffer();
-            let tab = [];
 
-            for (let i = 0; i < nbSommets; i++) {
-                tab = tab.concat(rgba);
-            }
 
-            objgl.bindBuffer(objgl.ARRAY_BUFFER, buf);
-            objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tab), objgl.STATIC_DRAW);
+        // // Relier un texel à un vertex
+        // function creerTexelsCube(objgl) {
+        //     var objTexelsCube = objgl.createBuffer();
 
-            return buf;
-        }
+        //     tabTexels = [  // Texels de la face avant
+        //         2.0, 1.0,  // 0: Centre
+        //         4.0, 0.0,  // 1: Coin haut droit
+        //         4.0, 2.0,  // 2: Coin bas droit
+        //         0.0, 2.0,  // 3: Coin bas gauche
+        //         0.0, 0.0,  // 4: Coin haut gauche
 
-        function creerCubeColoré(objgl, rgba) {
-            let objet3D = new Object();
+        //         // Texels de la face arrière
+        //         1.0, 2.0,   // 5: Centre
+        //         0.0, 0.0,   // 6: Coin haut droit
+        //         0.0, 4.0,   // 7: Coin bas droit
+        //         2.0, 4.0,   // 8: Coin bas gauche
+        //         2.0, 0.0    // 9: Coin haut gauche
+        //     ];
 
-            objet3D.vertex = creerGeometrieCube(objgl);
-            objet3D.couleurs = creerCouleursBuffer(objgl, rgba, 8);
-            objet3D.maillage = creerMaillageCube(objgl);
-            objet3D.texels = null;
-            objet3D.transformations = creerTransformations();
+        //     objgl.bindBuffer(objgl.ARRAY_BUFFER, objTexelsCube);
+        //     objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tabTexels), objgl.STATIC_DRAW);
 
-            return objet3D;
-        }
+        //     // 100% de la texture est utilisée
+        //     objTexelsCube.intNoTexture = TEX_PIERRES; objTexelsCube.pcCouleurTexel = 1.00;
 
-        function deplacerCamera() {
-            var camera = objScene3D.camera;
+        //     return objTexelsCube;
+        // }
 
-            if (event.keyCode == 37 || event.keyCode == 39) {
-                // 37:  Flèche-à-gauche; 39:Flèche-à-droite
-                var fltX = getCibleCameraX(camera) - getPositionCameraX(camera);
-                var fltZ = getCibleCameraZ(camera) - getPositionCameraZ(camera);
-                var intDirection = (event.keyCode == 37) ? -1 : 1;
-                var fltAngle = intDirection * Math.PI / 90; // Tourner 2 degrés
-                var fltXPrime = fltX * Math.cos(fltAngle) - fltZ * Math.sin(fltAngle);
-                var fltZPrime = fltX * Math.sin(fltAngle) + fltZ * Math.cos(fltAngle);
-                setCibleCameraX(getPositionCameraX(camera) + fltXPrime, camera);
-                setCibleCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
-            }
-            else
-                if (event.keyCode == 38 || event.keyCode == 40) {
-                    // 38:  Flèche-en-haut; 40:Flèche-en-bas
-                    var fltX = getCibleCameraX(camera) - getPositionCameraX(camera);
-                    var fltZ = getCibleCameraZ(camera) - getPositionCameraZ(camera);
-                    var fltRayon = Math.sqrt(fltX * fltX + fltZ * fltZ);
-                    var intDirection = (event.keyCode == 38) ? 1 : -1;
 
-                    var fltXPrime = intDirection * 0.2 * Math.cos(Math.acos(fltX / fltRayon));
-                    var fltZPrime = intDirection * 0.2 * Math.sin(Math.asin(fltZ / fltRayon));
+        // // Le maillage
+        // function creerMaillageCube(objgl) {
+        //     var objMaillageCube = objgl.createBuffer();
 
-                    setCibleCameraX(getCibleCameraX(camera) + fltXPrime, camera);
-                    setCibleCameraZ(getCibleCameraZ(camera) + fltZPrime, camera);
-                    setPositionCameraX(getPositionCameraX(camera) + fltXPrime, camera);
-                    setPositionCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
-                }
-                else
-                    if (event.keyCode == 33 || event.keyCode == 34) {
-                        // 33: Page Up; 34: Page Down
-                        var intDirection = (event.keyCode == 33) ? 1 : -1;
-                        setCibleCameraY(getCibleCameraY(camera) + intDirection * 0.2, camera);
-                        setPositionCameraY(getPositionCameraY(camera) + intDirection * 0.2, camera);
-                    }
+        //     var tabMaillage = [
+        //         // Face avant (Z=0)
+        //         0, 1, 2, 0, 2, 3,
+        //         // Face arrière (Z=1)
+        //         5, 4, 7, 5, 7, 6,
+        //         // Face gauche (X=0)
+        //         4, 0, 3, 4, 3, 7,
+        //         // Face droite (X=1)
+        //         1, 5, 6, 1, 6, 2,
+        //         // Face haut (Y=1)
+        //         3, 2, 6, 3, 6, 7,
+        //         // Face bas (Y=0) — optionnel, collée sur le plancher
+        //         4, 5, 1, 4, 1, 0
+        //     ];
 
+        //     objgl.bindBuffer(objgl.ELEMENT_ARRAY_BUFFER, objMaillageCube);
+        //     objgl.bufferData(objgl.ELEMENT_ARRAY_BUFFER, new Uint16Array(tabMaillage), objgl.STATIC_DRAW);
+
+        //     objMaillageCube.intNbTriangles = 12; // 6 faces × 2 triangles
+        //     objMaillageCube.intNbDroites = 0;    // plus de droites
+
+        //     return objMaillageCube;
+        // }
+
+
+
+        // function creerCouleursBuffer(objgl, rgba, nbSommets) {
+        //     let buf = objgl.createBuffer();
+        //     let tab = [];
+
+        //     for (let i = 0; i < nbSommets; i++) {
+        //         tab = tab.concat(rgba);
+        //     }
+
+        //     objgl.bindBuffer(objgl.ARRAY_BUFFER, buf);
+        //     objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tab), objgl.STATIC_DRAW);
+
+        //     return buf;
+        // }
+
+        // function creerCubeColoré(objgl, rgba) {
+        //     let objet3D = new Object();
+
+        //     objet3D.vertex = creerGeometrieCube(objgl);
+        //     objet3D.couleurs = creerCouleursBuffer(objgl, rgba, 8);
+        //     objet3D.maillage = creerMaillageCube(objgl);
+        //     objet3D.texels = null;
+        //     objet3D.transformations = creerTransformations();
+
+        //     return objet3D;
+        // }
+
+        // function deplacerCamera() {
+        //     var camera = objScene3D.camera;
+
+        //     if (event.keyCode == 37 || event.keyCode == 39) {
+        //         // 37:  Flèche-à-gauche; 39:Flèche-à-droite
+        //         var fltX = getCibleCameraX(camera) - getPositionCameraX(camera);
+        //         var fltZ = getCibleCameraZ(camera) - getPositionCameraZ(camera);
+        //         var intDirection = (event.keyCode == 37) ? -1 : 1;
+        //         var fltAngle = intDirection * Math.PI / 90; // Tourner 2 degrés
+        //         var fltXPrime = fltX * Math.cos(fltAngle) - fltZ * Math.sin(fltAngle);
+        //         var fltZPrime = fltX * Math.sin(fltAngle) + fltZ * Math.cos(fltAngle);
+        //         setCibleCameraX(getPositionCameraX(camera) + fltXPrime, camera);
+        //         setCibleCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
+        //     }
+        //     else
+        //         if (event.keyCode == 38 || event.keyCode == 40) {
+        //             // 38:  Flèche-en-haut; 40:Flèche-en-bas
+        //             var fltX = getCibleCameraX(camera) - getPositionCameraX(camera);
+        //             var fltZ = getCibleCameraZ(camera) - getPositionCameraZ(camera);
+        //             var fltRayon = Math.sqrt(fltX * fltX + fltZ * fltZ);
+        //             var intDirection = (event.keyCode == 38) ? 1 : -1;
+
+        //             var fltXPrime = intDirection * 0.2 * Math.cos(Math.acos(fltX / fltRayon));
+        //             var fltZPrime = intDirection * 0.2 * Math.sin(Math.asin(fltZ / fltRayon));
+
+        //             setCibleCameraX(getCibleCameraX(camera) + fltXPrime, camera);
+        //             setCibleCameraZ(getCibleCameraZ(camera) + fltZPrime, camera);
+        //             setPositionCameraX(getPositionCameraX(camera) + fltXPrime, camera);
+        //             setPositionCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
+        //         }
+        //         else
+        //             if (event.keyCode == 33 || event.keyCode == 34) {
+        //                 // 33: Page Up; 34: Page Down
+        //                 var intDirection = (event.keyCode == 33) ? 1 : -1;
+        //                 setCibleCameraY(getCibleCameraY(camera) + intDirection * 0.2, camera);
+        //                 setPositionCameraY(getPositionCameraY(camera) + intDirection * 0.2, camera);
+        //             }
+
+        //     effacerCanevas(objgl);
+        //     dessiner(objgl, objProgShaders, objScene3D);
+        // }
+
+    </script> -->
+    <script type="text/javascript">
+
+        var objgl = null;
+        var objProgShaders = null;
+        var objScene3D = null;
+
+        var TEX_TRANSPARENT = 0;
+        var TEX_PIERRES = 1;
+        var TEX_TRESOR = 2;
+        var TEX_CIEL = 3;
+
+        const HAUTEUR_PLAFOND = 2;
+
+        async function demarrer() {
+            var objCanvas = document.getElementById('monCanvas');
+            objgl = initWebGL(objCanvas);
+            objProgShaders = initShaders(objgl);
+            objScene3D = await initScene3D(objgl);
+            objgl.enable(objgl.DEPTH_TEST);
+            objgl.disable(objgl.CULL_FACE);
             effacerCanevas(objgl);
             dessiner(objgl, objProgShaders, objScene3D);
+        }
+
+        async function initScene3D(objgl) {
+            var objScene3D = new Object();
+            var tabObjets3D = new Array();
+
+            objScene3D.dedale = creerDedale(31);
+            objScene3D.textures = await creerTextures(objgl, [
+                'Transparent.gif',
+                'Pierres.jpg',
+                'coffre.jpg',
+                'Cloudy_sky.png'
+            ]);
+
+            // ── PLANCHER COULOIRS ──────────────────────────────────────
+            let plancherCouloir = new Object();
+            plancherCouloir.vertex = creerGeometriePlan(objgl);
+            plancherCouloir.couleurs = creerCouleursBuffer(objgl, [0.3, 0.3, 0.3, 1.0], 4);
+            plancherCouloir.maillage = null;
+            plancherCouloir.texels = null;
+            plancherCouloir.transformations = creerTransformations();
+            plancherCouloir.vertex.typeDessin = objgl.TRIANGLE_FAN;
+            setPositionsXYZ([15.5, 0, 15.5], plancherCouloir.transformations);
+            setEchellesXYZ([15.5, 1, 15.5], plancherCouloir.transformations);
+            tabObjets3D.push(plancherCouloir);
+
+            // ── PLANCHER ENCLOS ────────────────────────────────────────
+            let plancherEnclos = new Object();
+            plancherEnclos.vertex = creerGeometriePlan(objgl);
+            plancherEnclos.couleurs = creerCouleursBuffer(objgl, [0.6, 0.4, 0.1, 1.0], 4);
+            plancherEnclos.maillage = null;
+            plancherEnclos.texels = null;
+            plancherEnclos.transformations = creerTransformations();
+            plancherEnclos.vertex.typeDessin = objgl.TRIANGLE_FAN;
+            setPositionsXYZ([15.5, 0.01, 15.5], plancherEnclos.transformations);
+            setEchellesXYZ([1.5, 1, 1.5], plancherEnclos.transformations);
+            tabObjets3D.push(plancherEnclos);
+
+            // ── PLAFOND ────────────────────────────────────────────────
+            let plafond = creerPlanTexturé(objgl, TEX_CIEL, 1.0);
+            setPositionsXYZ([15.5, HAUTEUR_PLAFOND, 15.5], plafond.transformations);
+            setEchellesXYZ([15.5, 1, 15.5], plafond.transformations);
+            //setAngleX(180, plafond.transformations); // retourner pour regarder vers le bas
+            tabObjets3D.push(plafond);
+
+            // ── MURS ───────────────────────────────────────────────────
+            for (let i = 0; i < TAILLE_DEDALE; i++) {
+                for (let j = 0; j < TAILLE_DEDALE; j++) {
+                    let cellule = objScene3D.dedale[i][j];
+                    let mur = null;
+
+                    if (cellule == MUR_FIXE) {
+                        mur = creerCubeColoré(objgl, [0.1, 0.6, 0.1, 1.0]);
+                    } else if (cellule == MUR_OUVRABLE) {
+                        mur = creerCubeColoré(objgl, [0.7, 0.1, 0.1, 1.0]);
+                    }
+
+                    if (mur != null) {
+                        setPositionsXYZ([j, 0, i], mur.transformations);
+                        setEchellesXYZ([1, HAUTEUR_PLAFOND, 1], mur.transformations); // murs à la bonne hauteur
+                        tabObjets3D.push(mur);
+                    }
+                }
+            }
+
+            // ── TRÉSOR ─────────────────────────────────────────────────
+            var tresor = creerTresore(objgl, [1.0, 1.0, 1.0, 1.0]);
+            let randomXTresor, randomZTresor;
+            do {
+                randomXTresor = Math.floor(Math.random() * TAILLE_DEDALE);
+                randomZTresor = Math.floor(Math.random() * TAILLE_DEDALE);
+            } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR);
+            setPositionsXYZ([randomXTresor, 0, randomZTresor], tresor.transformations);
+            setEchellesXYZ([0.7, 0.4, 0.4], tresor.transformations);
+            tabObjets3D.push(tresor);
+
+            objScene3D.tabObjets3D = tabObjets3D;
+
+            // ── CAMÉRA ─────────────────────────────────────────────────
+            var camera = creerCamera();
+            setPositionsCameraXYZ([15.5, 0.5, 15.5], camera);
+            setCiblesCameraXYZ([15.5, 0.5, 16.5], camera);
+            setOrientationsXYZ([0, 1, 0], camera);
+            objScene3D.camera = camera;
+
+            // setPositionsCameraXYZ([15.5, 90, 15.5], camera);    // Positioned directly above center
+            // setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
+            // setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
+            // objScene3D.camera = camera;
+
+
+            return objScene3D; // ← toujours à la fin
         }
 
     </script>
