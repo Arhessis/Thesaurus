@@ -120,6 +120,7 @@
 
             objScene3D.tabObjets3D = tabObjets3D;
 
+
             // ── CAMÉRA ─────────────────────────────────────────────────
             var camera = creerCamera();
             setPositionsCameraXYZ([15.5, 0.5, 15.5], camera);
@@ -132,6 +133,54 @@
             // setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
             // objScene3D.camera = camera;
 
+
+            // ── FLÈCHES ────────────────────────────────────────────────
+            objScene3D.tabFleches = [];
+            let nbFleches = 18;
+
+            let distanceMinimale = 3;
+
+            for (let i = 0; i < nbFleches; i++) {
+                var fleche = creerFleche(objgl, [1.0, 0.84, 0.0, 1.0]);
+                setEchellesXYZ([0.2, 0.2, 0.2], fleche.transformations);
+                let randomX, randomZ;
+                let celluleValide = false;
+
+                while (!celluleValide) {
+                    randomX = Math.floor(Math.random() * TAILLE_DEDALE);
+                    randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
+
+                    if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
+                        !(randomX === randomXTresor && randomZ === randomZTresor)) {
+                        let tropProche = false;
+
+                        for (let j = 0; j < objScene3D.tabFleches.length; j++) {
+                            let posFlecheExistante = getPositionsXYZ(objScene3D.tabFleches[j].transformations);
+
+                            let xExistant = posFlecheExistante[0] - 0.5;
+                            let zExistant = posFlecheExistante[2] - 0.5;
+
+                            let distance = Math.sqrt(Math.pow(randomX - xExistant, 2) + Math.pow(randomZ - zExistant, 2));
+
+                            if (distance < distanceMinimale) {
+                                tropProche = true;
+                                break;
+                            }
+                        }
+
+                        if (!tropProche) {
+                            celluleValide = true;
+                        }
+                    }
+                }
+
+                setPositionsXYZ([randomX + 0.5, 0.6, randomZ + 0.5], fleche.transformations);
+                
+                objScene3D.tabFleches.push(fleche);
+                tabObjets3D.push(fleche);
+            }
+
+            pointeVersTresor(objScene3D);
 
             return objScene3D; // ← toujours à la fin
         }
