@@ -118,6 +118,8 @@
             setEchellesXYZ([0.7, 0.4, 0.4], tresor.transformations);
             tabObjets3D.push(tresor);
 
+            objScene3D.tresor = tresor;
+
             objScene3D.tabObjets3D = tabObjets3D;
 
 
@@ -134,15 +136,17 @@
             // objScene3D.camera = camera;
 
 
-            // ── FLÈCHES ────────────────────────────────────────────────
+            // ── FLÈCHES ─────────────────────────────────────────────────────
             objScene3D.tabFleches = [];
             let nbFleches = 18;
 
+            // Define how many blocks apart the arrows must be (3 is a good balance for a 31x31 grid)
             let distanceMinimale = 3;
 
             for (let i = 0; i < nbFleches; i++) {
                 var fleche = creerFleche(objgl, [1.0, 0.84, 0.0, 1.0]);
                 setEchellesXYZ([0.2, 0.2, 0.2], fleche.transformations);
+
                 let randomX, randomZ;
                 let celluleValide = false;
 
@@ -150,36 +154,44 @@
                     randomX = Math.floor(Math.random() * TAILLE_DEDALE);
                     randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
 
+                    // 1. Is it an empty corridor and NOT the treasure cell?
                     if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
                         !(randomX === randomXTresor && randomZ === randomZTresor)) {
+
                         let tropProche = false;
 
+                        // 2. Check the distance against all already placed arrows
                         for (let j = 0; j < objScene3D.tabFleches.length; j++) {
                             let posFlecheExistante = getPositionsXYZ(objScene3D.tabFleches[j].transformations);
 
+                            // We must subtract the 0.5 offset to get back to pure grid coordinates for the math
                             let xExistant = posFlecheExistante[0] - 0.5;
                             let zExistant = posFlecheExistante[2] - 0.5;
 
+                            // Calculate the distance using the Pythagorean theorem
                             let distance = Math.sqrt(Math.pow(randomX - xExistant, 2) + Math.pow(randomZ - zExistant, 2));
 
                             if (distance < distanceMinimale) {
                                 tropProche = true;
-                                break;
+                                break; // Stop checking the rest, we already know it's too close
                             }
                         }
 
+                        // 3. If it is NOT too close to any existing arrow, the cell is valid!
                         if (!tropProche) {
                             celluleValide = true;
                         }
                     }
                 }
 
+                // Apply the +0.5 offset to perfectly center the arrow in the corridor
                 setPositionsXYZ([randomX + 0.5, 0.6, randomZ + 0.5], fleche.transformations);
-                
+
                 objScene3D.tabFleches.push(fleche);
                 tabObjets3D.push(fleche);
             }
 
+            // Make all arrows point to the treasure immediately
             pointeVersTresor(objScene3D);
 
             return objScene3D; // ← toujours à la fin
