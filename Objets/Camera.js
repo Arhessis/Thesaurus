@@ -143,10 +143,26 @@ function deplacerCamera() {
     setCibleCameraX(getPositionCameraX(camera) + fltXPrime, camera);
     setCibleCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
   }
+  // else if (event.keyCode == 38 || event.keyCode == 40) {
+  //   if (objScene3D.binVueAerienne) return;
+
+  //   // 38:  Flèche-en-haut; 40:Flèche-en-bas
+  //   var fltX = getCibleCameraX(camera) - getPositionCameraX(camera);
+  //   var fltZ = getCibleCameraZ(camera) - getPositionCameraZ(camera);
+  //   var fltRayon = Math.sqrt(fltX * fltX + fltZ * fltZ);
+  //   var intDirection = (event.keyCode == 38) ? 1 : -1;
+
+  //   var fltXPrime = intDirection * 0.2 * Math.cos(Math.acos(fltX / fltRayon));
+  //   var fltZPrime = intDirection * 0.2 * Math.sin(Math.asin(fltZ / fltRayon));
+
+  //   setCibleCameraX(getCibleCameraX(camera) + fltXPrime, camera);
+  //   setCibleCameraZ(getCibleCameraZ(camera) + fltZPrime, camera);
+  //   setPositionCameraX(getPositionCameraX(camera) + fltXPrime, camera);
+  //   setPositionCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
+  // }
   else if (event.keyCode == 38 || event.keyCode == 40) {
     if (objScene3D.binVueAerienne) return;
 
-    // 38:  Flèche-en-haut; 40:Flèche-en-bas
     var fltX = getCibleCameraX(camera) - getPositionCameraX(camera);
     var fltZ = getCibleCameraZ(camera) - getPositionCameraZ(camera);
     var fltRayon = Math.sqrt(fltX * fltX + fltZ * fltZ);
@@ -155,10 +171,27 @@ function deplacerCamera() {
     var fltXPrime = intDirection * 0.2 * Math.cos(Math.acos(fltX / fltRayon));
     var fltZPrime = intDirection * 0.2 * Math.sin(Math.asin(fltZ / fltRayon));
 
-    setCibleCameraX(getCibleCameraX(camera) + fltXPrime, camera);
-    setCibleCameraZ(getCibleCameraZ(camera) + fltZPrime, camera);
-    setPositionCameraX(getPositionCameraX(camera) + fltXPrime, camera);
-    setPositionCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
+    // Calculate where the camera WOULD move to
+    // var newX = getPositionCameraX(camera) + fltXPrime;
+    // var newZ = getPositionCameraZ(camera) + fltZPrime;
+    var MARGIN = 0.3; // how far from walls to stay
+    var newX = getPositionCameraX(camera) + fltXPrime + (fltXPrime > 0 ? MARGIN : -MARGIN);
+    var newZ = getPositionCameraZ(camera) + fltZPrime + (fltZPrime > 0 ? MARGIN : -MARGIN);
+
+    // Convert to grid coordinates and check the maze
+    var gridX = Math.floor(newX);
+    var gridZ = Math.floor(newZ);
+
+    // Only move if the target cell is not a wall
+    if (gridX >= 0 && gridZ >= 0 &&
+      gridX < TAILLE_DEDALE && gridZ < TAILLE_DEDALE &&
+      objScene3D.dedale[gridZ][gridX] === COULOIR) {
+
+      setCibleCameraX(getCibleCameraX(camera) + fltXPrime, camera);
+      setCibleCameraZ(getCibleCameraZ(camera) + fltZPrime, camera);
+      setPositionCameraX(getPositionCameraX(camera) + fltXPrime, camera);
+      setPositionCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
+    }
   }
   else if (event.keyCode == 33) {
     // PAGE UP (Vue Aérienne)

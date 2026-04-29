@@ -27,9 +27,10 @@
         var objScene3D = null;
 
         var TEX_TRANSPARENT = 0;
-        var TEX_PIERRES = 1;
+        var TEX_OUVRABLES = 1;
         var TEX_TRESOR = 2;
         var TEX_CIEL = 3;
+        var TEX_FIXE = 4;
 
         const HAUTEUR_PLAFOND = 2;
 
@@ -51,9 +52,10 @@
             objScene3D.dedale = creerDedale(31);
             objScene3D.textures = await creerTextures(objgl, [
                 './Images/Transparent.gif',
-                './Images/Pierres.jpg',
+                './Images/cobblestone.webp',
                 './Images/coffre.jpg',
-                './Images/Cloudy_sky.png'
+                './Images/Cloudy_sky.png',
+                './Images/bedrock.webp'
             ]);
 
             // ── PLANCHER COULOIRS ──────────────────────────────────────
@@ -92,12 +94,12 @@
                 for (let j = 0; j < TAILLE_DEDALE; j++) {
                     let cellule = objScene3D.dedale[i][j];
                     let mur = null;
-
                     if (cellule == MUR_FIXE) {
-                        mur = creerCubeColoré(objgl, [0.1, 0.6, 0.1, 1.0]);
+                        mur = creerCubeTexturé(objgl, TEX_FIXE, 1.0);
                     } else if (cellule == MUR_OUVRABLE) {
-                        mur = creerCubeColoré(objgl, [0.7, 0.1, 0.1, 1.0]);
+                        mur = creerCubeTexturé(objgl, TEX_OUVRABLES, 1.0); // or a different texture
                     }
+
 
                     if (mur != null) {
                         setPositionsXYZ([j, 0, i], mur.transformations);

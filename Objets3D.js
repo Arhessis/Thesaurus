@@ -94,3 +94,36 @@ function creerPlanTexturé(objgl, noTexture, pcCouleur) {
 
     return obj;
 }
+
+function creerCubeTexturé(objgl, noTexture, pcCouleur) {
+    let obj = new Object();
+
+    obj.vertex = creerGeometrieCube(objgl);
+    obj.maillage = creerMaillageCube(objgl);
+    obj.transformations = creerTransformations();
+
+    // White color buffer (texture will provide the color)
+    obj.couleurs = creerCouleursBuffer(objgl, [1.0, 1.0, 1.0, 1.0], 8);
+
+    // UV coordinates for each of the 8 cube vertices
+    let buf = objgl.createBuffer();
+    let tabTexels = [
+        // Front face vertices (0-3)
+        0.0, 1.0,  // vertex 0: bottom-left
+        1.0, 1.0,  // vertex 1: bottom-right
+        1.0, 0.0,  // vertex 2: top-right
+        0.0, 0.0,  // vertex 3: top-left
+        // Back face vertices (4-7)
+        1.0, 1.0,  // vertex 4: bottom-left
+        0.0, 1.0,  // vertex 5: bottom-right
+        0.0, 0.0,  // vertex 6: top-right
+        1.0, 0.0   // vertex 7: top-left
+    ];
+    objgl.bindBuffer(objgl.ARRAY_BUFFER, buf);
+    objgl.bufferData(objgl.ARRAY_BUFFER, new Float32Array(tabTexels), objgl.STATIC_DRAW);
+    buf.intNoTexture = noTexture;
+    buf.pcCouleurTexel = pcCouleur;
+    obj.texels = buf;
+
+    return obj;
+}
