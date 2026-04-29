@@ -18,6 +18,7 @@
     <script src="Dessin.js"></script>
     <script src="./Objets/Tresor.js"></script>
     <script src="./Objets/Fleches.js"></script>
+    <script src="./Objets/Pointeur_joueur.js"></script>
 
 
     <script type="text/javascript">
@@ -132,17 +133,11 @@
             setOrientationsXYZ([0, 1, 0], camera);
             objScene3D.camera = camera;
 
-            // setPositionsCameraXYZ([15.5, 90, 15.5], camera);    // Positioned directly above center
-            // setCiblesCameraXYZ([15.5, 0, 15.5], camera);        // Looking straight down at the center
-            // setOrientationsXYZ([0, 0, 1], camera);              // Up vector pointing north (positive Z)
-            // objScene3D.camera = camera;
-
 
             // ── FLÈCHES ─────────────────────────────────────────────────────
             objScene3D.tabFleches = [];
             let nbFleches = 18;
 
-            // Define how many blocks apart the arrows must be (3 is a good balance for a 31x31 grid)
             let distanceMinimale = 3;
 
             for (let i = 0; i < nbFleches; i++) {
@@ -156,47 +151,72 @@
                     randomX = Math.floor(Math.random() * TAILLE_DEDALE);
                     randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
 
-                    // 1. Is it an empty corridor and NOT the treasure cell?
                     if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
                         !(randomX === randomXTresor && randomZ === randomZTresor)) {
 
                         let tropProche = false;
 
-                        // 2. Check the distance against all already placed arrows
                         for (let j = 0; j < objScene3D.tabFleches.length; j++) {
                             let posFlecheExistante = getPositionsXYZ(objScene3D.tabFleches[j].transformations);
 
-                            // We must subtract the 0.5 offset to get back to pure grid coordinates for the math
                             let xExistant = posFlecheExistante[0] - 0.5;
                             let zExistant = posFlecheExistante[2] - 0.5;
 
-                            // Calculate the distance using the Pythagorean theorem
                             let distance = Math.sqrt(Math.pow(randomX - xExistant, 2) + Math.pow(randomZ - zExistant, 2));
 
                             if (distance < distanceMinimale) {
                                 tropProche = true;
-                                break; // Stop checking the rest, we already know it's too close
+                                break;
                             }
                         }
 
-                        // 3. If it is NOT too close to any existing arrow, the cell is valid!
                         if (!tropProche) {
                             celluleValide = true;
                         }
                     }
                 }
 
-                // Apply the +0.5 offset to perfectly center the arrow in the corridor
                 setPositionsXYZ([randomX + 0.5, 0.6, randomZ + 0.5], fleche.transformations);
 
                 objScene3D.tabFleches.push(fleche);
                 tabObjets3D.push(fleche);
             }
 
-            // Make all arrows point to the treasure immediately
             pointeVersTresor(objScene3D);
 
-            return objScene3D; // ← toujours à la fin
+            // ── Indicateur joueur ─────────────────────────────────────────────────────
+            var pointeur = creerPointeur(objgl, [1.0, 0.0, 0.0, 1.0]); 
+            setEchellesXYZ([0, 0, 0], pointeur.transformations); 
+            objScene3D.pointeur = pointeur;
+            tabObjets3D.push(pointeur);
+
+            const originalDessiner = dessiner;
+            dessiner = function (objgl, objProgShaders, objScene3D) {
+                if (objScene3D && objScene3D.pointeur) {
+                    if (objScene3D.binVueAerienne && objScene3D.cameraJoueur) {
+                        setEchellesXYZ([0.6, 1.0, 0.6], objScene3D.pointeur.transformations);
+
+                        let camX = getPositionCameraX(objScene3D.cameraJoueur);
+                        let camZ = getPositionCameraZ(objScene3D.cameraJoueur);
+
+                        let cibleX = getCibleCameraX(objScene3D.cameraJoueur);
+                        let cibleZ = getCibleCameraZ(objScene3D.cameraJoueur);
+
+                        setPositionsXYZ([camX, HAUTEUR_PLAFOND - 0.05, camZ], objScene3D.pointeur.transformations);
+
+                        let dx = cibleX - camX;
+                        let dz = cibleZ - camZ;
+                        let angleDegre = Math.atan2(dx, dz) * (180 / Math.PI);
+
+                        setAngleY(angleDegre, objScene3D.pointeur.transformations);
+                    } else {
+                        setEchellesXYZ([0, 0, 0], objScene3D.pointeur.transformations);
+                    }
+                }
+                originalDessiner(objgl, objProgShaders, objScene3D);
+            };
+
+            return objScene3D;
         }
 
     </script>
