@@ -161,22 +161,17 @@ function deplacerCamera() {
     setPositionCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
   }
   else if (event.keyCode == 33) {
-    // PAGE UP (Vue Aérienne)
     if (!objScene3D.binVueAerienne) {
-      // 1. Save a clone of the player's current camera array
       objScene3D.cameraJoueur = objScene3D.camera.slice();
       objScene3D.binVueAerienne = true;
 
-      // 2. Set the current camera to the aerial position
       setPositionsCameraXYZ([15.5, 50, 15.5], camera);
       setCiblesCameraXYZ([15.5, 0, 15.5], camera);
       setOrientationsXYZ([0, 0, 1], camera);
     }
   }
   else if (event.keyCode == 34) {
-    // PAGE DOWN (Retour au joueur)
     if (objScene3D.binVueAerienne && objScene3D.cameraJoueur) {
-      // 1. Restore the active camera by cloning the saved backup
       objScene3D.camera = objScene3D.cameraJoueur.slice();
       objScene3D.binVueAerienne = false;
     }
