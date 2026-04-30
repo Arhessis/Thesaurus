@@ -127,6 +127,7 @@ function setOrientationZ(fltOrientationZ, tabCamera) {
   tabCamera[8] = fltOrientationZ;
 }
 
+let nbOuvertures = 3;
 function deplacerCamera() {
   var camera = objScene3D.camera;
 
@@ -196,12 +197,17 @@ function deplacerCamera() {
   }
   else if (event.keyCode == 32) { // Barre d'Espace
     if (objScene3D.binVueAerienne) {
-        // Mode triche (CTRL + SHIFT + ESPACE) pour afficher ou cacher les objets spéciaux
-        if (event.ctrlKey && event.shiftKey) {
-            objScene3D.binTriche = !objScene3D.binTriche;
-        }
+      // Mode triche (CTRL + SHIFT + ESPACE) pour afficher ou cacher les objets spéciaux
+      if (event.ctrlKey && event.shiftKey) {
+        objScene3D.binTriche = !objScene3D.binTriche;
+      }
     } else {
-        // Placez ici la logique d'ouverture des murs pour plus tard
+      if (objScene3D.nbMursDetruisables > 0) {
+        if (detruireMurEnFace(objScene3D.camera, objScene3D.dedale)) {
+          objScene3D.nbMursDetruisables--;
+        }
+      }
+      console.log("Murs détruisables restants : " + objScene3D.nbMursDetruisables);
     }
   }
 

@@ -21,6 +21,19 @@ function dessiner(objgl, objProgShaders, objScene3D) {
             }
         }
 
+        // Empeche de redessiner un mur détruit
+        if (objet.typeObjet === "mur") {
+            var posMur = getPositionsXYZ(objet.transformations);
+            var murX = Math.floor(posMur[0]);
+            var murZ = Math.floor(posMur[2]);
+            if (murZ >= 0 && murZ < TAILLE_DEDALE && murX >= 0 && murX < TAILLE_DEDALE) {
+                var cellule = objScene3D.dedale[murZ][murX];
+                if (cellule === COULOIR) {
+                    continue;
+                }
+            }
+        }
+
         var vertex = objet.vertex;
         var couleurs = objet.couleurs;
         var texels = objet.texels;

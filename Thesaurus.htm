@@ -33,7 +33,7 @@
         var TEX_CIEL = 3;
         var TEX_FIXE = 4;
 
-        const HAUTEUR_PLAFOND = 2;
+        const HAUTEUR_PLAFOND = 1.5;
 
         async function demarrer() {
             var objCanvas = document.getElementById('monCanvas');
@@ -51,12 +51,13 @@
             var tabObjets3D = new Array();
 
             objScene3D.dedale = creerDedale(31);
+            objScene3D.nbMursDetruisables = 4; // nombre de murs que le joueur peut détruire
             objScene3D.textures = await creerTextures(objgl, [
                 './Images/Transparent.gif',
-                './Images/cobblestone.webp',
+                './Images/brick.jpg',
                 './Images/coffre.jpg',
                 './Images/Cloudy_sky.png',
-                './Images/bedrock.webp'
+                './Images/bedrock2.avif'
             ]);
 
             // ── PLANCHER COULOIRS ──────────────────────────────────────
