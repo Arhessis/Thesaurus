@@ -35,15 +35,28 @@
 
         const HAUTEUR_PLAFOND = 1.5;
 
+        function redimensionnerCanvas() {
+            var objCanvas = document.getElementById('monCanvas');
+            objCanvas.width = window.innerWidth;
+            objCanvas.height = window.innerHeight;
+
+            if (objgl && objProgShaders && objScene3D) {
+                effacerCanevas(objgl);
+                dessiner(objgl, objProgShaders, objScene3D);
+            }
+        }
+
         async function demarrer() {
             var objCanvas = document.getElementById('monCanvas');
             objgl = initWebGL(objCanvas);
             objProgShaders = initShaders(objgl);
             objScene3D = await initScene3D(objgl);
+
             objgl.enable(objgl.DEPTH_TEST);
             objgl.disable(objgl.CULL_FACE);
-            effacerCanevas(objgl);
-            dessiner(objgl, objProgShaders, objScene3D);
+
+            window.addEventListener('resize', redimensionnerCanvas);
+            redimensionnerCanvas();
         }
 
         async function initScene3D(objgl) {
@@ -232,16 +245,6 @@
 </head>
 
 <body onload="demarrer()">
-    <header class="sTexteCentre sLargeurDiv sEntete">
-        <p>
-            <span class="sTitreApp">
-                Thesaurus<br />
-            </span> par
-            <span class="sAuteurApp">
-                Bolu Ali-Balogun et George Georgiev
-            </span>
-        </p>
-    </header>
 
     <div class="game-container">
         <canvas id="monCanvas" width="640" height="640" tabIndex="1" onkeydown="deplacerCamera(); return false">

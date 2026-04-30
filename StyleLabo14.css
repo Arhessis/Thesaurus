@@ -1,7 +1,14 @@
 ﻿BODY {
+    margin: 0;
+    overflow: hidden;
     font-family: arial;
     font-size: 10pt;
     color: black;
+    background-color: black;
+}
+
+#monCanvas {
+    display: block;
 }
 
 .sTexteCentre {
@@ -42,8 +49,8 @@
 
 .game-container {
     position: relative;
-    width: 640px;
-    margin: 0 auto;
+    width: 100vw;
+    height: 100vh;
 }
 
 #hud-container {
