@@ -130,10 +130,9 @@ function setOrientationZ(fltOrientationZ, tabCamera) {
 function deplacerCamera() {
   var camera = objScene3D.camera;
 
-  if (event.keyCode == 37 || event.keyCode == 39) {
-    if (objScene3D.binVueAerienne) return;
+  if (event.keyCode == 37 || event.keyCode == 39) { // Gauche / Droite
+    if (objScene3D.binVueAerienne) return; // Bloque les mouvements en vue aérienne
 
-    // 37:  Flèche-à-gauche; 39:Flèche-à-droite
     var fltX = getCibleCameraX(camera) - getPositionCameraX(camera);
     var fltZ = getCibleCameraZ(camera) - getPositionCameraZ(camera);
     var intDirection = (event.keyCode == 37) ? -1 : 1;
@@ -143,23 +142,6 @@ function deplacerCamera() {
     setCibleCameraX(getPositionCameraX(camera) + fltXPrime, camera);
     setCibleCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
   }
-  // else if (event.keyCode == 38 || event.keyCode == 40) {
-  //   if (objScene3D.binVueAerienne) return;
-
-  //   // 38:  Flèche-en-haut; 40:Flèche-en-bas
-  //   var fltX = getCibleCameraX(camera) - getPositionCameraX(camera);
-  //   var fltZ = getCibleCameraZ(camera) - getPositionCameraZ(camera);
-  //   var fltRayon = Math.sqrt(fltX * fltX + fltZ * fltZ);
-  //   var intDirection = (event.keyCode == 38) ? 1 : -1;
-
-  //   var fltXPrime = intDirection * 0.2 * Math.cos(Math.acos(fltX / fltRayon));
-  //   var fltZPrime = intDirection * 0.2 * Math.sin(Math.asin(fltZ / fltRayon));
-
-  //   setCibleCameraX(getCibleCameraX(camera) + fltXPrime, camera);
-  //   setCibleCameraZ(getCibleCameraZ(camera) + fltZPrime, camera);
-  //   setPositionCameraX(getPositionCameraX(camera) + fltXPrime, camera);
-  //   setPositionCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
-  // }
   else if (event.keyCode == 38 || event.keyCode == 40) {
     if (objScene3D.binVueAerienne) return;
 
@@ -193,20 +175,33 @@ function deplacerCamera() {
       setPositionCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
     }
   }
-  else if (event.keyCode == 33) {
+  else if (event.keyCode == 33) { // Page Up
     if (!objScene3D.binVueAerienne) {
-      objScene3D.cameraJoueur = objScene3D.camera.slice();
+      objScene3D.cameraJoueur = objScene3D.camera.slice(); // Sauvegarde de la position et orientation
       objScene3D.binVueAerienne = true;
+      objScene3D.binTriche = false; // La triche est désactivée par défaut au passage en vue aérienne
 
-      setPositionsCameraXYZ([15.5, 50, 15.5], camera);
+      // Hauteur à 30 pour voir tout le dédale
+      setPositionsCameraXYZ([15.5, 37, 15.5], camera);
       setCiblesCameraXYZ([15.5, 0, 15.5], camera);
-      setOrientationsXYZ([0, 0, 1], camera);
+      setOrientationsXYZ([0, 0, 1], camera); // L'orientation Z fixe le repère "Nord"
     }
   }
-  else if (event.keyCode == 34) {
+  else if (event.keyCode == 34) { // Page Down
     if (objScene3D.binVueAerienne && objScene3D.cameraJoueur) {
-      objScene3D.camera = objScene3D.cameraJoueur.slice();
+      objScene3D.camera = objScene3D.cameraJoueur.slice(); // Retourne exactement à la vue du joueur
       objScene3D.binVueAerienne = false;
+      objScene3D.binTriche = false;
+    }
+  }
+  else if (event.keyCode == 32) { // Barre d'Espace
+    if (objScene3D.binVueAerienne) {
+        // Mode triche (CTRL + SHIFT + ESPACE) pour afficher ou cacher les objets spéciaux
+        if (event.ctrlKey && event.shiftKey) {
+            objScene3D.binTriche = !objScene3D.binTriche;
+        }
+    } else {
+        // Placez ici la logique d'ouverture des murs pour plus tard
     }
   }
 
