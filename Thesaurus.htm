@@ -67,6 +67,7 @@
             plancherCouloir.vertex.typeDessin = objgl.TRIANGLE_FAN;
             setPositionsXYZ([15.5, 0, 15.5], plancherCouloir.transformations);
             setEchellesXYZ([15.5, 1, 15.5], plancherCouloir.transformations);
+            plancherCouloir.typeObjet = "plancher";
             tabObjets3D.push(plancherCouloir);
 
             // ── PLANCHER ENCLOS ────────────────────────────────────────
@@ -79,6 +80,7 @@
             plancherEnclos.vertex.typeDessin = objgl.TRIANGLE_FAN;
             setPositionsXYZ([15.5, 0.01, 15.5], plancherEnclos.transformations);
             setEchellesXYZ([1.5, 1, 1.5], plancherEnclos.transformations);
+            plancherEnclos.typeObjet = "plancher";
             tabObjets3D.push(plancherEnclos);
 
             // ── PLAFOND ────────────────────────────────────────────────
@@ -86,6 +88,7 @@
             setPositionsXYZ([15.5, HAUTEUR_PLAFOND, 15.5], plafond.transformations);
             setEchellesXYZ([15.5, 1, 15.5], plafond.transformations);
             //setAngleX(180, plafond.transformations); // retourner pour regarder vers le bas
+            plafond.typeObjet = "plafond";
             tabObjets3D.push(plafond);
 
             // ── MURS ───────────────────────────────────────────────────
@@ -103,6 +106,7 @@
                     if (mur != null) {
                         setPositionsXYZ([j, 0, i], mur.transformations);
                         setEchellesXYZ([1, HAUTEUR_PLAFOND, 1], mur.transformations); // murs à la bonne hauteur
+                        mur.typeObjet = "mur";
                         tabObjets3D.push(mur);
                     }
                 }
@@ -117,6 +121,7 @@
             } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR);
             setPositionsXYZ([randomXTresor, 0, randomZTresor], tresor.transformations);
             setEchellesXYZ([0.7, 0.4, 0.4], tresor.transformations);
+            tresor.typeObjet = "tresor";
             tabObjets3D.push(tresor);
 
             objScene3D.tresor = tresor;
@@ -140,6 +145,7 @@
 
             for (let i = 0; i < nbFleches; i++) {
                 var fleche = creerFleche(objgl, [1.0, 0.84, 0.0, 1.0]);
+                fleche.typeObjet = "fleche";
                 setEchellesXYZ([0.2, 0.2, 0.2], fleche.transformations);
 
                 let randomX, randomZ;
@@ -182,8 +188,9 @@
 
             pointeVersTresor(objScene3D);
 
-            // ── Indicateur joueur ─────────────────────────────────────────────────────
+            // ── Pointeur du joueur dans la vue aérienne ─────────────────────────────────────────────────────
             var pointeur = creerPointeur(objgl, [1.0, 0.0, 0.0, 1.0]); 
+            pointeur.typeObjet = "pointeur";
             setEchellesXYZ([0, 0, 0], pointeur.transformations); 
             objScene3D.pointeur = pointeur;
             tabObjets3D.push(pointeur);
