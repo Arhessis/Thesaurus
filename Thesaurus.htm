@@ -19,6 +19,7 @@
     <script src="./Objets/Tresor.js"></script>
     <script src="./Objets/Fleches.js"></script>
     <script src="./Objets/Pointeur_joueur.js"></script>
+    <script src="HUD.js"></script>
 
 
     <script type="text/javascript">
@@ -222,6 +223,8 @@
                 }
                 originalDessiner(objgl, objProgShaders, objScene3D);
             };
+
+            creerHUD();
 
             return objScene3D;
         }
