@@ -46,8 +46,9 @@
             }
         }
 
-        async function demarrer() {
+        async function init() {
             var objCanvas = document.getElementById('monCanvas');
+
             objgl = initWebGL(objCanvas);
             objProgShaders = initShaders(objgl);
             objScene3D = await initScene3D(objgl);
@@ -57,6 +58,13 @@
 
             window.addEventListener('resize', redimensionnerCanvas);
             redimensionnerCanvas();
+        }
+
+        function demarrer() {
+            document.getElementById('menu-container').style.display = 'none';
+            document.getElementById('hud-container').style.display = 'flex';
+
+            document.getElementById('monCanvas').focus();
         }
 
         async function initScene3D(objgl) {
@@ -244,15 +252,21 @@
     </script>
 </head>
 
-<body onload="demarrer()">
-
+<body onload="init()">
     <div class="game-container">
+
+        <div id="menu-container">
+            <h1 class="menu-title">Thesaurus</h1>
+            <p class="menu-subtitle">Par Bolu Ali-Balogun et George Georgiev</p>
+            <button id="btn-jouer" onclick="demarrer()">Jouer</button>
+        </div>
+
         <canvas id="monCanvas" width="640" height="640" tabIndex="1" onkeydown="deplacerCamera(); return false">
             Votre navigateur ne supporte pas la balise canvas
         </canvas>
 
         <!-- The HUD Div -->
-        <div id="hud-container">
+        <div id="hud-container" style="display: none;"> <!-- Hide HUD initially -->
             <span class="sHUD">Niveau: <span id="niveau" class="valeur-hud">1</span></span>
             <span class="sHUD">Ouvreurs murs: <span id="ouvreursMurs" class="valeur-hud">4</span></span>
             <span class="sHUD">Secondes: <span id="seconde" class="valeur-hud">60</span></span>
