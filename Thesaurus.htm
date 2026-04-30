@@ -192,9 +192,9 @@
             pointeVersTresor(objScene3D);
 
             // ── Pointeur du joueur dans la vue aérienne ─────────────────────────────────────────────────────
-            var pointeur = creerPointeur(objgl, [1.0, 0.0, 0.0, 1.0]); 
+            var pointeur = creerPointeur(objgl, [1.0, 0.0, 0.0, 1.0]);
             pointeur.typeObjet = "pointeur";
-            setEchellesXYZ([0, 0, 0], pointeur.transformations); 
+            setEchellesXYZ([0, 0, 0], pointeur.transformations);
             objScene3D.pointeur = pointeur;
             tabObjets3D.push(pointeur);
 
@@ -224,6 +224,7 @@
                 originalDessiner(objgl, objProgShaders, objScene3D);
             };
 
+
             return objScene3D;
         }
 
@@ -234,7 +235,7 @@
     <header class="sTexteCentre sLargeurDiv sEntete">
         <p>
             <span class="sTitreApp">
-                Mur de pierres<br />
+                Thesaurus<br />
             </span> par
             <span class="sAuteurApp">
                 Bolu Ali-Balogun et George Georgiev
@@ -242,22 +243,20 @@
         </p>
     </header>
 
-    <canvas id="monCanvas" width="640" height="640" tabIndex="1" onkeydown="deplacerCamera(); return false">
-        Votre navigateur ne supporte pas la balise canvas
-    </canvas>
+    <div class="game-container">
+        <canvas id="monCanvas" width="640" height="640" tabIndex="1" onkeydown="deplacerCamera(); return false">
+            Votre navigateur ne supporte pas la balise canvas
+        </canvas>
 
-    <footer class="sLargeurDiv sPiedDePage">
-        <p>
-            <a href="http://www.cgodin.qc.ca">
-                <img src="./Images/logoCGG.jpg" alt="logoCGG" />
-            </a>
-            <a href="http://www.cgodin.qc.ca/programme/techniques-informatique/">
-                Département d'informatique du Cégep Gérald-Godin
-            </a>
-            <br />
-            &copy; 2026
-        </p>
-    </footer>
+        <!-- The HUD Div -->
+        <div id="hud-container">
+            <span class="sHUD">Niveau: <span id="niveau" class="valeur-hud">1</span></span>
+            <span class="sHUD">Ouvreurs murs: <span id="ouvreursMurs" class="valeur-hud">4</span></span>
+            <span class="sHUD">Secondes: <span id="seconde" class="valeur-hud">60</span></span>
+            <span class="sHUD">Score: <span id="score" class="valeur-hud">0</span></span>
+        </div>
+    </div>
+
 </body>
 
 </html>
