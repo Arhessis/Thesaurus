@@ -20,29 +20,29 @@ function detruireMurEnFace(camera, dedale) {
     var absX = Math.abs(dirX);
     var absZ = Math.abs(dirZ);
 
-        if (absX < 0.001 && absZ < 0.001) {
-            return false;
-        }
+    if (absX < 0.001 && absZ < 0.001) {
+        return false;
+    }
 
-        var targetX = Math.floor(posX);
-        var targetZ = Math.floor(posZ);
+    var targetX = Math.floor(posX);
+    var targetZ = Math.floor(posZ);
 
-        if (absX > absZ) {
-            targetX = Math.floor(posX + (dirX > 0 ? 1 : -1));
-        } else {
-            targetZ = Math.floor(posZ + (dirZ > 0 ? 1 : -1));
-        }
+    if (absX > absZ) {
+        targetX = Math.floor(posX + (dirX > 0 ? 1 : -1));
+    } else {
+        targetZ = Math.floor(posZ + (dirZ > 0 ? 1 : -1));
+    }
 
 
-        if (targetX < 0 || targetX >= TAILLE_DEDALE || targetZ < 0 || targetZ >= TAILLE_DEDALE) {
-            return false;
-        }
+    if (targetX < 0 || targetX >= TAILLE_DEDALE || targetZ < 0 || targetZ >= TAILLE_DEDALE) {
+        return false;
+    }
 
-        if (dedale[targetZ][targetX] === MUR_OUVRABLE) {
-            setCell(dedale, targetX, targetZ, COULOIR);
-            return true;
-        }
- 
+    if (dedale[targetZ][targetX] === MUR_OUVRABLE) {
+        setCell(dedale, targetX, targetZ, COULOIR);
+        return true;
+    }
+
     return false;
 }
 

@@ -29,7 +29,7 @@ function creerTextures(objgl, tabImages) {
 
                 var largeur = objImage.width;
                 var hauteur = objImage.height;
-                var puissanceDeux = function(valeur) {
+                var puissanceDeux = function (valeur) {
                     return (valeur & (valeur - 1)) === 0;
                 };
 

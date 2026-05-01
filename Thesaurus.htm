@@ -40,6 +40,22 @@
             objgl = initWebGL(objCanvas);
             objProgShaders = initShaders(objgl);
             objScene3D = await initScene3D(objgl);
+
+            document.addEventListener('keydown', deplacerCamera);
+            document.addEventListener('mousemove', deplacerCameraSouris);
+            objCanvas.addEventListener('click', function () {
+                if (objCanvas.requestPointerLock) {
+                    objCanvas.requestPointerLock();
+                }
+            });
+            document.addEventListener('pointerlockchange', function () {
+                if (document.pointerLockElement === objCanvas) {
+                    objCanvas.style.cursor = 'none';
+                } else {
+                    objCanvas.style.cursor = 'crosshair';
+                }
+            });
+
             objgl.enable(objgl.DEPTH_TEST);
             objgl.disable(objgl.CULL_FACE);
             effacerCanevas(objgl);
@@ -63,7 +79,7 @@
             // ── PLANCHER COULOIRS ──────────────────────────────────────
             let plancherCouloir = new Object();
             plancherCouloir.vertex = creerGeometriePlan(objgl);
-            plancherCouloir.couleurs = creerCouleursBuffer(objgl, [0.3, 0.3, 0.3, 1.0], 4);
+            plancherCouloir.couleurs = creerCouleursBuffer(objgl, [0.3, 0.0, 0.0, 1.0], 4);
             plancherCouloir.maillage = null;
             plancherCouloir.texels = null;
             plancherCouloir.transformations = creerTransformations();
@@ -192,9 +208,9 @@
             pointeVersTresor(objScene3D);
 
             // ── Pointeur du joueur dans la vue aérienne ─────────────────────────────────────────────────────
-            var pointeur = creerPointeur(objgl, [1.0, 0.0, 0.0, 1.0]); 
+            var pointeur = creerPointeur(objgl, [1.0, 0.0, 0.0, 1.0]);
             pointeur.typeObjet = "pointeur";
-            setEchellesXYZ([0, 0, 0], pointeur.transformations); 
+            setEchellesXYZ([0, 0, 0], pointeur.transformations);
             objScene3D.pointeur = pointeur;
             tabObjets3D.push(pointeur);
 
@@ -242,7 +258,8 @@
         </p>
     </header>
 
-    <canvas id="monCanvas" width="640" height="640" tabIndex="1" onkeydown="deplacerCamera(); return false">
+    <canvas id="monCanvas" width="640" height="640" tabIndex="1"
+        title="Click to lock pointer and move mouse to look; arrow keys move.">
         Votre navigateur ne supporte pas la balise canvas
     </canvas>
 
