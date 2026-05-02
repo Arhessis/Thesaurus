@@ -70,7 +70,7 @@ function creerMaillageTresor(objgl) {
     return objMaillage;
 }
 
-function verfierCollisionTresor(objScene3D) {
+function verifierCollisionTresor(objScene3D) {
     let camX = getPositionCameraX(objScene3D.camera);
     let camZ = getPositionCameraZ(objScene3D.camera);
 
