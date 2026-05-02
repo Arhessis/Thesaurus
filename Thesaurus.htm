@@ -24,7 +24,7 @@
     <script type="text/javascript">
 
         // ── DANS Thesaurus.html ── ajout au début du script ──────────────
-        const VITESSE_MAX = 0.02; // ← ajuste la vitesse ici
+        const VITESSE_MAX = 0.008; // ← ajuste la vitesse ici
 
         var touchesEnfoncees = {};
         var boucleActive = false;
@@ -345,7 +345,14 @@
 
 <body onload="init()">
     <div class="game-container">
-        <canvas id="monCanvas" width="640" height="640" tabIndex="1">
+
+        <div id="menu-container">
+            <h1 class="menu-title">Thesaurus</h1>
+            <p class="menu-subtitle">Par Bolu Ali-Balogun et George Georgiev</p>
+            <button id="btn-jouer" onclick="demarrer()">Jouer</button>
+        </div>
+
+        <canvas id="monCanvas" width="640" height="640" tabIndex="1" onkeydown="deplacerCamera(); return false">
             Votre navigateur ne supporte pas la balise canvas
         </canvas>
 
