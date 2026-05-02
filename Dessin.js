@@ -23,6 +23,9 @@ function dessiner(objgl, objProgShaders, objScene3D) {
 
         // Empeche de redessiner un mur détruit
         if (objet.typeObjet === "mur") {
+            if (objet === objScene3D.murSpawn && !objScene3D.murSpawn.actif) {
+        continue;
+    }
             var posMur = getPositionsXYZ(objet.transformations);
             var murX = Math.floor(posMur[0]);
             var murZ = Math.floor(posMur[2]);

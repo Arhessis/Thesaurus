@@ -23,6 +23,12 @@
 
     <script type="text/javascript">
 
+        // ── DANS Thesaurus.html ── ajout au début du script ──────────────
+        const VITESSE_MAX = 0.02; // ← ajuste la vitesse ici
+
+        var touchesEnfoncees = {};
+        var boucleActive = false;
+
         var objgl = null;
         var objProgShaders = null;
         var objScene3D = null;
@@ -41,7 +47,62 @@
             objProgShaders = initShaders(objgl);
             objScene3D = await initScene3D(objgl);
 
-            document.addEventListener('keydown', deplacerCamera);
+            //document.addEventListener('keydown', deplacerCamera);
+            // ── Remplace document.addEventListener('keydown', deplacerCamera) par : ──
+
+            document.addEventListener('keydown', function (event) {
+                touchesEnfoncees[event.keyCode] = true;
+
+                // Touches spéciales (vue aérienne, espace) gérées ici une seule fois
+                if (event.keyCode === 33) { // Page Up → vue aérienne
+                    if (!objScene3D.binVueAerienne) {
+                        objScene3D.cameraJoueur = objScene3D.camera.slice();
+                        objScene3D.binVueAerienne = true;
+                        objScene3D.binTriche = false;
+                        var camera = objScene3D.camera;
+                        setPositionsCameraXYZ([15.5, 37, 15.5], camera);
+                        setCiblesCameraXYZ([15.5, 0, 15.5], camera);
+                        setOrientationsXYZ([0, 0, 1], camera);
+                    }
+                    effacerCanevas(objgl);
+                    dessiner(objgl, objProgShaders, objScene3D);
+                }
+                else if (event.keyCode === 34) { // Page Down → retour joueur
+                    if (objScene3D.binVueAerienne && objScene3D.cameraJoueur) {
+                        objScene3D.camera = objScene3D.cameraJoueur.slice();
+                        objScene3D.binVueAerienne = false;
+                        objScene3D.binTriche = false;
+                    }
+                    effacerCanevas(objgl);
+                    dessiner(objgl, objProgShaders, objScene3D);
+                }
+                else if (event.keyCode === 32) { // Espace → détruire mur
+                    event.preventDefault();
+                    if (objScene3D.binVueAerienne) {
+                        if (event.ctrlKey && event.shiftKey) {
+                            objScene3D.binTriche = !objScene3D.binTriche;
+                        }
+                    } else {
+                        if (objScene3D.nbMursDetruisables > 0) {
+                            if (detruireMurEnFace(objScene3D.camera, objScene3D.dedale)) {
+                                objScene3D.nbMursDetruisables--;
+                            }
+                        }
+                    }
+                    effacerCanevas(objgl);
+                    dessiner(objgl, objProgShaders, objScene3D);
+                }
+
+                // Lance la boucle si pas encore active
+                if (!boucleActive) {
+                    boucleActive = true;
+                    deplacerCamera();
+                }
+            });
+
+            document.addEventListener('keyup', function (event) {
+                touchesEnfoncees[event.keyCode] = false;
+            });
             document.addEventListener('mousemove', deplacerCameraSouris);
             objCanvas.addEventListener('click', function () {
                 if (objCanvas.requestPointerLock) {
@@ -51,6 +112,11 @@
             document.addEventListener('pointerlockchange', function () {
                 if (document.pointerLockElement === objCanvas) {
                     objCanvas.style.cursor = 'none';
+                    // Start the render loop when mouse is captured
+                    if (!boucleActive) {
+                        boucleActive = true;
+                        deplacerCamera();
+                    }
                 } else {
                     objCanvas.style.cursor = 'crosshair';
                 }
@@ -240,6 +306,16 @@
                 originalDessiner(objgl, objProgShaders, objScene3D);
             };
 
+            // ── MUR DE SORTIE DU SPAWN ─────────────────────────────────────
+            var murSpawn = creerCubeTexturé(objgl, TEX_FIXE, 1.0);
+            setPositionsXYZ([15, 0, 17], murSpawn.transformations);
+            setEchellesXYZ([1, HAUTEUR_PLAFOND, 1], murSpawn.transformations);
+            murSpawn.typeObjet = "mur";
+            murSpawn.actif = false; // invisible and non-blocking until player leaves spawn
+            tabObjets3D.push(murSpawn);
+            objScene3D.murSpawn = murSpawn;
+            objScene3D.aQuittéSpawn = false;
+
 
             return objScene3D;
         }
@@ -260,7 +336,7 @@
     </header>
 
     <div class="game-container">
-        <canvas id="monCanvas" width="640" height="640" tabIndex="1" onkeydown="deplacerCamera(); return false">
+        <canvas id="monCanvas" width="640" height="640" tabIndex="1">
             Votre navigateur ne supporte pas la balise canvas
         </canvas>
 

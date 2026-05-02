@@ -182,19 +182,81 @@ function rotateCamera(tabCamera, fltYaw, fltPitch) {
   tabDirection = rotateVectorAroundAxis(tabDirection, tabUp, fltYaw);
   tabDirection = normalizeVector(tabDirection);
 
-  // Try applying pitch
+  // Try applying pitch, but clamp so the camera can't flip past straight up/down
+  var PITCH_LIMIT = 0.98; // dirY of ~0.98 ≈ 78 degrees — adjust to taste
   var tabPitched = rotateVectorAroundAxis(tabDirection, tabRight, fltPitch);
   tabPitched = normalizeVector(tabPitched);
 
-  // Clamp: don't allow looking more than ~60 degrees up or down
-  // dirY of 0.85 ≈ 58 degrees, adjust this value to taste
-  var PITCH_LIMIT = 0.75;
   if (tabPitched[1] < PITCH_LIMIT && tabPitched[1] > -PITCH_LIMIT) {
     tabDirection = tabPitched;
   }
+  // If the pitch would exceed the limit, we keep tabDirection as-is (yaw already applied)
+  // This means horizontal look still works even at the vertical boundary
 
   setDirectionCameraXYZ(tabDirection, tabCamera);
 }
+
+function tryMoveCamera(camera, dx, dz) {
+  var MARGIN = 0.25;
+
+  function isFree(x, z) {
+    var gx = Math.floor(x);
+    var gz = Math.floor(z);
+    if (gx < 0 || gz < 0 || gx >= TAILLE_DEDALE || gz >= TAILLE_DEDALE) return false;
+    return objScene3D.dedale[gz][gx] === COULOIR;
+  }
+
+  var curX = getPositionCameraX(camera);
+  var curZ = getPositionCameraZ(camera);
+  var newX = curX + dx;
+  var newZ = curZ + dz;
+
+  var canMoveX = isFree(newX + MARGIN, curZ + MARGIN) &&
+    isFree(newX + MARGIN, curZ - MARGIN) &&
+    isFree(newX - MARGIN, curZ + MARGIN) &&
+    isFree(newX - MARGIN, curZ - MARGIN);
+
+  var canMoveZ = isFree(curX + MARGIN, newZ + MARGIN) &&
+    isFree(curX + MARGIN, newZ - MARGIN) &&
+    isFree(curX - MARGIN, newZ + MARGIN) &&
+    isFree(curX - MARGIN, newZ - MARGIN);
+
+  if (canMoveX) {
+    setPositionCameraX(newX, camera);
+  }
+
+  if (canMoveZ) {
+    setPositionCameraZ(newZ, camera);
+  }
+
+  var dir = getDirectionCameraXYZ(camera);
+  setCibleCameraX(getPositionCameraX(camera) + dir[0], camera);
+  setCibleCameraZ(getPositionCameraZ(camera) + dir[2], camera);
+
+  return canMoveX || canMoveZ;
+}
+
+// function deplacerCameraSouris(event) {
+//   if (!objScene3D || objScene3D.binVueAerienne) return;
+//   if (document.pointerLockElement !== document.getElementById('monCanvas')) return;
+
+//   var camera = objScene3D.camera;
+//   var sensitivity = 0.001;
+//   var fltYaw = -event.movementX * sensitivity;
+//   var fltPitch = event.movementY * sensitivity;
+
+//   rotateCamera(camera, fltYaw, fltPitch);
+
+//   var EYE_HEIGHT = 0.5;
+//   setPositionCameraY(EYE_HEIGHT, camera);
+//   setCibleCameraY(
+//     EYE_HEIGHT + getDirectionCameraXYZ(camera)[1],
+//     camera
+//   );
+
+//   effacerCanevas(objgl);
+//   dessiner(objgl, objProgShaders, objScene3D);
+// }
 
 function deplacerCameraSouris(event) {
   if (!objScene3D || objScene3D.binVueAerienne) return;
@@ -207,214 +269,65 @@ function deplacerCameraSouris(event) {
 
   rotateCamera(camera, fltYaw, fltPitch);
 
-  // Keep camera Y locked at player eye level — never let it drift
   var EYE_HEIGHT = 0.5;
   setPositionCameraY(EYE_HEIGHT, camera);
   setCibleCameraY(
     EYE_HEIGHT + getDirectionCameraXYZ(camera)[1],
     camera
   );
-
-  effacerCanevas(objgl);
-  dessiner(objgl, objProgShaders, objScene3D);
+  // No drawing here — the game loop handles all rendering
 }
 
-function tryMoveCamera(camera, dx, dz) {
-  var MARGIN = 0.25; // player "radius"
-
-  var newX = getPositionCameraX(camera) + dx;
-  var newZ = getPositionCameraZ(camera) + dz;
-
-  // Check all 4 corners of the player's bounding box
-  function isFree(x, z) {
-    var gx = Math.floor(x);
-    var gz = Math.floor(z);
-    if (gx < 0 || gz < 0 || gx >= TAILLE_DEDALE || gz >= TAILLE_DEDALE) return false;
-    return objScene3D.dedale[gz][gx] === COULOIR;
+function deplacerCamera() {
+  if (!objScene3D || objScene3D.binVueAerienne) {
+    boucleActive = false;
+    return;
   }
 
-  var canMoveX = isFree(newX + MARGIN, getPositionCameraZ(camera) + MARGIN) &&
-    isFree(newX + MARGIN, getPositionCameraZ(camera) - MARGIN) &&
-    isFree(newX - MARGIN, getPositionCameraZ(camera) + MARGIN) &&
-    isFree(newX - MARGIN, getPositionCameraZ(camera) - MARGIN);
-
-  var canMoveZ = isFree(getPositionCameraX(camera) + MARGIN, newZ + MARGIN) &&
-    isFree(getPositionCameraX(camera) + MARGIN, newZ - MARGIN) &&
-    isFree(getPositionCameraX(camera) - MARGIN, newZ + MARGIN) &&
-    isFree(getPositionCameraX(camera) - MARGIN, newZ - MARGIN);
-
-  if (canMoveX) {
-    setPositionCameraX(newX, camera);
-  }
-  if (canMoveZ) {
-    setPositionCameraZ(newZ, camera);
-  }
-
-  // Always update the target to match new position + current direction
-  var dir = getDirectionCameraXYZ(camera);
-  setCibleCameraX(getPositionCameraX(camera) + dir[0], camera);
-  setCibleCameraZ(getPositionCameraZ(camera) + dir[2], camera);
-
-  return canMoveX || canMoveZ;
-}
-
-let nbOuvertures = 3;
-// function deplacerCamera(event) {
-//   event = event || window.event;
-//   var camera = objScene3D.camera;
-
-//   if (event.keyCode === 37 || event.keyCode === 38 || event.keyCode === 39 || event.keyCode === 40) {
-//     if (event.preventDefault) event.preventDefault();
-//     if (objScene3D.binVueAerienne) return;
-
-//     var tabDirection = getDirectionCameraXYZ(camera);
-//     tabDirection[1] = 0;
-//     tabDirection = normalizeVector(tabDirection);
-//     var tabRight = normalizeVector(crossProduct(getOrientationsXYZ(camera), tabDirection));
-//     var fltStep = 0.2;
-//     var dx = 0, dz = 0;
-
-//     if (event.keyCode === 38) { // flèche haut = avancer
-//       dx = tabDirection[0] * fltStep;
-//       dz = tabDirection[2] * fltStep;
-//     } else if (event.keyCode === 40) { // flèche bas = reculer
-//       dx = -tabDirection[0] * fltStep;
-//       dz = -tabDirection[2] * fltStep;
-//     } else if (event.keyCode === 37) { // flèche gauche = strafe gauche
-//       dx = -tabRight[0] * fltStep;
-//       dz = -tabRight[2] * fltStep;
-//     } else if (event.keyCode === 39) { // flèche droite = strafe droite
-//       dx = tabRight[0] * fltStep;
-//       dz = tabRight[2] * fltStep;
-//     }
-
-//     tryMoveCamera(camera, dx, dz);
-//   }
-//   else if (event.keyCode == 38 || event.keyCode == 40) {
-//     if (objScene3D.binVueAerienne) return;
-
-//     var fltX = getCibleCameraX(camera) - getPositionCameraX(camera);
-//     var fltZ = getCibleCameraZ(camera) - getPositionCameraZ(camera);
-//     var fltRayon = Math.sqrt(fltX * fltX + fltZ * fltZ);
-//     var intDirection = (event.keyCode == 38) ? 1 : -1;
-
-//     var fltXPrime = intDirection * 0.2 * Math.cos(Math.acos(fltX / fltRayon));
-//     var fltZPrime = intDirection * 0.2 * Math.sin(Math.asin(fltZ / fltRayon));
-
-//     // Calculate where the camera WOULD move to
-//     // var newX = getPositionCameraX(camera) + fltXPrime;
-//     // var newZ = getPositionCameraZ(camera) + fltZPrime;
-//     var MARGIN = 0.3; // how far from walls to stay
-//     var newX = getPositionCameraX(camera) + fltXPrime + (fltXPrime > 0 ? MARGIN : -MARGIN);
-//     var newZ = getPositionCameraZ(camera) + fltZPrime + (fltZPrime > 0 ? MARGIN : -MARGIN);
-
-//     // Convert to grid coordinates and check the maze
-//     var gridX = Math.floor(newX);
-//     var gridZ = Math.floor(newZ);
-
-//     // Only move if the target cell is not a wall
-//     if (gridX >= 0 && gridZ >= 0 &&
-//       gridX < TAILLE_DEDALE && gridZ < TAILLE_DEDALE &&
-//       objScene3D.dedale[gridZ][gridX] === COULOIR) {
-
-//       setCibleCameraX(getCibleCameraX(camera) + fltXPrime, camera);
-//       setCibleCameraZ(getCibleCameraZ(camera) + fltZPrime, camera);
-//       setPositionCameraX(getPositionCameraX(camera) + fltXPrime, camera);
-//       setPositionCameraZ(getPositionCameraZ(camera) + fltZPrime, camera);
-//     }
-//   }
-//   else if (event.keyCode == 33) { // Page Up
-//     if (!objScene3D.binVueAerienne) {
-//       objScene3D.cameraJoueur = objScene3D.camera.slice(); // Sauvegarde de la position et orientation
-//       objScene3D.binVueAerienne = true;
-//       objScene3D.binTriche = false; // La triche est désactivée par défaut au passage en vue aérienne
-
-//       // Hauteur à 30 pour voir tout le dédale
-//       setPositionsCameraXYZ([15.5, 37, 15.5], camera);
-//       setCiblesCameraXYZ([15.5, 0, 15.5], camera);
-//       setOrientationsXYZ([0, 0, 1], camera); // L'orientation Z fixe le repère "Nord"
-//     }
-//   }
-//   else if (event.keyCode == 34) { // Page Down
-//     if (objScene3D.binVueAerienne && objScene3D.cameraJoueur) {
-//       objScene3D.camera = objScene3D.cameraJoueur.slice(); // Retourne exactement à la vue du joueur
-//       objScene3D.binVueAerienne = false;
-//       objScene3D.binTriche = false;
-//     }
-//   }
-//   else if (event.keyCode == 32) { // Barre d'Espace
-//     if (objScene3D.binVueAerienne) {
-//       // Mode triche (CTRL + SHIFT + ESPACE) pour afficher ou cacher les objets spéciaux
-//       if (event.ctrlKey && event.shiftKey) {
-//         objScene3D.binTriche = !objScene3D.binTriche;
-//       }
-//     } else {
-//       if (objScene3D.nbMursDetruisables > 0) {
-//         if (detruireMurEnFace(objScene3D.camera, objScene3D.dedale)) {
-//           objScene3D.nbMursDetruisables--;
-//         }
-//       }
-//       console.log("Murs détruisables restants : " + objScene3D.nbMursDetruisables);
-//     }
-//   }
-
-//   effacerCanevas(objgl);
-//   dessiner(objgl, objProgShaders, objScene3D);
-// }
-function deplacerCamera(event) {
-  event = event || window.event;
   var camera = objScene3D.camera;
-
-  var keyUp = event.keyCode === 38 || event.keyCode === 87; // ↑ or W
-  var keyDown = event.keyCode === 40 || event.keyCode === 83; // ↓ or S
+  var keyUp = touchesEnfoncees[38] || touchesEnfoncees[87]; // ↑ W
+  var keyDown = touchesEnfoncees[40] || touchesEnfoncees[83]; // ↓ S
 
   if (keyUp || keyDown) {
-    if (event.preventDefault) event.preventDefault();
-    if (objScene3D.binVueAerienne) return;
-
     var tabDirection = getDirectionCameraXYZ(camera);
-    tabDirection[1] = 0; // stay on the ground plane
+    tabDirection[1] = 0;
     tabDirection = normalizeVector(tabDirection);
 
-    var fltStep = 0.2;
     var sign = keyUp ? 1 : -1;
-    var dx = tabDirection[0] * fltStep * sign;
-    var dz = tabDirection[2] * fltStep * sign;
+    var dx = tabDirection[0] * VITESSE_MAX * sign;
+    var dz = tabDirection[2] * VITESSE_MAX * sign;
 
     tryMoveCamera(camera, dx, dz);
   }
-  else if (event.keyCode === 33) { // Page Up → aerial view
-    if (!objScene3D.binVueAerienne) {
-      objScene3D.cameraJoueur = objScene3D.camera.slice();
-      objScene3D.binVueAerienne = true;
-      objScene3D.binTriche = false;
-      setPositionsCameraXYZ([15.5, 37, 15.5], camera);
-      setCiblesCameraXYZ([15.5, 0, 15.5], camera);
-      setOrientationsXYZ([0, 0, 1], camera);
-    }
-  }
-  else if (event.keyCode === 34) { // Page Down → return to player view
-    if (objScene3D.binVueAerienne && objScene3D.cameraJoueur) {
-      objScene3D.camera = objScene3D.cameraJoueur.slice();
-      objScene3D.binVueAerienne = false;
-      objScene3D.binTriche = false;
-    }
-  }
-  else if (event.keyCode === 32) { // Space → destroy wall
-    if (objScene3D.binVueAerienne) {
-      if (event.ctrlKey && event.shiftKey) {
-        objScene3D.binTriche = !objScene3D.binTriche;
+
+  // ── FERMETURE DU SPAWN ─────────────────────────────────────
+  if (!objScene3D.aQuittéSpawn && objScene3D.murSpawn) {
+    if (getPositionCameraZ(camera) > 18.2) {
+      objScene3D.aQuittéSpawn = true;
+      objScene3D.murSpawn.actif = true;
+      objScene3D.dedale[17][15] = MUR_FIXE;
+
+      var camZ = getPositionCameraZ(camera);
+      if (camZ < 18.25 + 0.25) {
+        setPositionCameraZ(18.25 + 0.25, camera);
+        var dir = getDirectionCameraXYZ(camera);
+        setCibleCameraZ(getPositionCameraZ(camera) + dir[2], camera);
       }
-    } else {
-      if (objScene3D.nbMursDetruisables > 0) {
-        if (detruireMurEnFace(objScene3D.camera, objScene3D.dedale)) {
-          objScene3D.nbMursDetruisables--;
-        }
-      }
-      console.log("Murs détruisables restants : " + objScene3D.nbMursDetruisables);
     }
   }
 
   effacerCanevas(objgl);
   dessiner(objgl, objProgShaders, objScene3D);
+
+  // Always keep the loop running while pointer is locked
+  if (document.pointerLockElement === document.getElementById('monCanvas')) {
+    requestAnimationFrame(deplacerCamera);
+  } else {
+    var aTouches = Object.values(touchesEnfoncees).some(v => v);
+    if (aTouches) {
+      requestAnimationFrame(deplacerCamera);
+    } else {
+      boucleActive = false;
+    }
+  }
 }
