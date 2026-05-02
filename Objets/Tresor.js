@@ -69,3 +69,18 @@ function creerMaillageTresor(objgl) {
 
     return objMaillage;
 }
+
+function verfierCollisionTresor(objScene3D) {
+    let camX = getPositionCameraX(objScene3D.camera);
+    let camZ = getPositionCameraZ(objScene3D.camera);
+
+    let posTresor = getPositionsXYZ(objScene3D.tresor.transformations);
+    let tresorX = posTresor[0];
+    let tresorZ = posTresor[2];
+
+    let distance = Math.sqrt(Math.pow(tresorX - camX, 2) + Math.pow(tresorZ - camZ, 2));
+
+    if (distance < 0.5) {
+        passerAuNiveauSuivant(objScene3D);
+    }
+}
