@@ -41,8 +41,20 @@
 
         const HAUTEUR_PLAFOND = 1.5;
 
-        async function demarrer() {
+        function redimensionnerCanvas() {
             var objCanvas = document.getElementById('monCanvas');
+            objCanvas.width = window.innerWidth;
+            objCanvas.height = window.innerHeight;
+
+            if (objgl && objProgShaders && objScene3D) {
+                effacerCanevas(objgl);
+                dessiner(objgl, objProgShaders, objScene3D);
+            }
+        }
+
+        async function init() {
+            var objCanvas = document.getElementById('monCanvas');
+
             objgl = initWebGL(objCanvas);
             objProgShaders = initShaders(objgl);
             objScene3D = await initScene3D(objgl);
@@ -124,8 +136,16 @@
 
             objgl.enable(objgl.DEPTH_TEST);
             objgl.disable(objgl.CULL_FACE);
-            effacerCanevas(objgl);
-            dessiner(objgl, objProgShaders, objScene3D);
+
+            window.addEventListener('resize', redimensionnerCanvas);
+            redimensionnerCanvas();
+        }
+
+        function demarrer() {
+            document.getElementById('menu-container').style.display = 'none';
+            document.getElementById('hud-container').style.display = 'flex';
+
+            document.getElementById('monCanvas').focus();
         }
 
         async function initScene3D(objgl) {
@@ -323,25 +343,14 @@
     </script>
 </head>
 
-<body onload="demarrer()">
-    <header class="sTexteCentre sLargeurDiv sEntete">
-        <p>
-            <span class="sTitreApp">
-                Thesaurus<br />
-            </span> par
-            <span class="sAuteurApp">
-                Bolu Ali-Balogun et George Georgiev
-            </span>
-        </p>
-    </header>
-
+<body onload="init()">
     <div class="game-container">
         <canvas id="monCanvas" width="640" height="640" tabIndex="1">
             Votre navigateur ne supporte pas la balise canvas
         </canvas>
 
         <!-- The HUD Div -->
-        <div id="hud-container">
+        <div id="hud-container" style="display: none;"> <!-- Hide HUD initially -->
             <span class="sHUD">Niveau: <span id="niveau" class="valeur-hud">1</span></span>
             <span class="sHUD">Ouvreurs murs: <span id="ouvreursMurs" class="valeur-hud">4</span></span>
             <span class="sHUD">Secondes: <span id="seconde" class="valeur-hud">60</span></span>
