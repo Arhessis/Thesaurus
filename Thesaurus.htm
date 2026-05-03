@@ -5,7 +5,8 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Thesaurus</title>
-    <link rel="stylesheet" type="text/css" href="StyleLabo14.css" />
+    <link rel="stylesheet" type="text/css" href="StyleThesaurus.css" />
+    <link rel="stylesheet" type="text/css" href="StyleHUD.css" />
 
     <script src="WebGl.js"></script>
     <script src="ShaderCouleursTextures.js"></script>
@@ -16,6 +17,7 @@
     <script src="Dedale.js"></script>
     <script src="Objets3D.js"></script>
     <script src="Dessin.js"></script>
+    <script src="Niveaux.js"></script>
     <script src="./Objets/Tresor.js"></script>
     <script src="./Objets/Fleches.js"></script>
     <script src="./Objets/Pointeur_joueur.js"></script>
@@ -25,6 +27,9 @@
 
         // ── DANS Thesaurus.html ── ajout au début du script ──────────────
         const VITESSE_MAX = 0.008; // ← ajuste la vitesse ici
+
+        var DUREE_NIVEAU_TEST = 60;
+        var intervalleMinuterie;
 
         var touchesEnfoncees = {};
         var boucleActive = false;
@@ -76,17 +81,24 @@
 
                 // Touches spéciales (vue aérienne, espace) gérées ici une seule fois
                 if (event.keyCode === 33) { // Page Up → vue aérienne
-                    if (!objScene3D.binVueAerienne) {
-                        objScene3D.cameraJoueur = objScene3D.camera.slice();
-                        objScene3D.binVueAerienne = true;
-                        objScene3D.binTriche = false;
-                        var camera = objScene3D.camera;
-                        setPositionsCameraXYZ([15.5, 37, 15.5], camera);
-                        setCiblesCameraXYZ([15.5, 0, 15.5], camera);
-                        setOrientationsXYZ([0, 0, 1], camera);
+                    let scoreActuel = parseInt(document.getElementById('score').innerText);
+
+                    if (scoreActuel >= 10) {
+                        scoreActuel -= 10;
+                        document.getElementById('score').innerText = scoreActuel;
+
+                        if (!objScene3D.binVueAerienne) {
+                            objScene3D.cameraJoueur = objScene3D.camera.slice();
+                            objScene3D.binVueAerienne = true;
+                            objScene3D.binTriche = false;
+                            var camera = objScene3D.camera;
+                            setPositionsCameraXYZ([15.5, 37, 15.5], camera);
+                            setCiblesCameraXYZ([15.5, 0, 15.5], camera);
+                            setOrientationsXYZ([0, 0, 1], camera);
+                        }
+                        effacerCanevas(objgl);
+                        dessiner(objgl, objProgShaders, objScene3D);
                     }
-                    effacerCanevas(objgl);
-                    dessiner(objgl, objProgShaders, objScene3D);
                 }
                 else if (event.keyCode === 34) { // Page Down → retour joueur
                     if (objScene3D.binVueAerienne && objScene3D.cameraJoueur) {
@@ -104,9 +116,16 @@
                             objScene3D.binTriche = !objScene3D.binTriche;
                         }
                     } else {
-                        if (objScene3D.nbMursDetruisables > 0) {
+                        let scoreActuel = parseInt(document.getElementById('score').innerText);
+
+                        if (objScene3D.nbMursDetruisables > 0 && scoreActuel >= 50) {
                             if (detruireMurEnFace(objScene3D.camera, objScene3D.dedale)) {
                                 objScene3D.nbMursDetruisables--;
+
+                                document.getElementById('ouvreursMurs').innerText = objScene3D.nbMursDetruisables;
+
+                                scoreActuel -= 50;
+                                document.getElementById('score').innerText = scoreActuel;
                             }
                         }
                     }
@@ -153,8 +172,9 @@
         function demarrer() {
             document.getElementById('menu-container').style.display = 'none';
             document.getElementById('hud-container').style.display = 'flex';
-
             document.getElementById('monCanvas').focus();
+
+            demarrerMinuterie();
         }
 
         async function initScene3D(objgl) {
@@ -349,79 +369,6 @@
             return objScene3D;
         }
 
-        function passerAuNiveauSuivant(objScene3D) {
-            let niveauActuel = parseInt(document.getElementById('niveau').innerText);
-            niveauActuel++;
-
-            if (niveauActuel > 10) {
-                boucleActive = false;
-                return;
-            }
-
-            document.getElementById('niveau').innerText = niveauActuel;
-
-            let secondes = parseInt(document.getElementById('seconde').innerText);
-            let score = parseInt(document.getElementById('score').innerText);
-
-            score += (secondes * 10);
-
-            document.getElementById('score').innerText = score;
-            document.getElementById('seconde').innerText = "60";
-
-            let ouvreurs = Math.floor((10 - niveauActuel) / 2) + (niveauActuel % 2 !== 0 ? 0 : 1);
-            if (niveauActuel === 1 || niveauActuel === 2) ouvreurs = 4;
-            document.getElementById('ouvreursMurs').innerText = ouvreurs;
-            objScene3D.nbMursDetruisables = ouvreurs;
-
-            setPositionsCameraXYZ([15.5, 0.5, 15.5], objScene3D.camera);
-            setCiblesCameraXYZ([15.5, 0.5, 16.5], objScene3D.camera);
-            setOrientationsXYZ([0, 1, 0], objScene3D.camera);
-
-            objScene3D.aQuittSpawn = false;
-            objScene3D.murSpawn.actif = false;
-            objScene3D.dedale[17][15] = COULOIR;
-
-            let randomXTresor, randomZTresor;
-            do {
-                randomXTresor = Math.floor(Math.random() * TAILLE_DEDALE);
-                randomZTresor = Math.floor(Math.random() * TAILLE_DEDALE);
-            } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR || (randomXTresor === 15 && randomZTresor === 15));
-
-            setPositionsXYZ([randomXTresor + 0.5, 0, randomZTresor + 0.5], objScene3D.tresor.transformations);
-
-            let nbFleches = 18 - ((niveauActuel - 1) * 2);
-
-            objScene3D.tabObjets3D = objScene3D.tabObjets3D.filter(obj => obj.typeObjet !== "fleche");
-            objScene3D.tabFleches = [];
-
-            for (let i = 0; i < nbFleches; i++) {
-                let fleche = creerFleche(objgl, [1.0, 0.84, 0.0, 1.0]);
-                fleche.typeObjet = "fleche";
-                setEchellesXYZ([0.2, 0.2, 0.2], fleche.transformations);
-
-                let randomX, randomZ;
-                let celluleValide = false;
-
-                while (!celluleValide) {
-                    randomX = Math.floor(Math.random() * TAILLE_DEDALE);
-                    randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
-
-                    if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
-                        !(randomX === randomXTresor && randomZ === randomZTresor) &&
-                        !(randomX === 15 && randomZ === 15)) {
-                        celluleValide = true;
-                    }
-                }
-
-                setPositionsXYZ([randomX + 0.5, 0.6, randomZ + 0.5], fleche.transformations);
-                objScene3D.tabFleches.push(fleche);
-                objScene3D.tabObjets3D.push(fleche);
-            }
-
-            pointeVersTresor(objScene3D);
-
-        }
-
     </script>
 </head>
 
@@ -442,8 +389,15 @@
         <div id="hud-container" style="display: none;"> <!-- Hide HUD initially -->
             <span class="sHUD">Niveau: <span id="niveau" class="valeur-hud">10</span></span>
             <span class="sHUD">Ouvreurs murs: <span id="ouvreursMurs" class="valeur-hud">4</span></span>
-            <span class="sHUD">Secondes: <span id="seconde" class="valeur-hud">60</span></span>
-            <span class="sHUD">Score: <span id="score" class="valeur-hud">0</span></span>
+
+            <div id="hud-timer" class="sHUD-timer sHUD-font-color-white">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 8 14"></polyline>
+                </svg><span id="seconde" class="valeur-hud">60</span>
+            </div>
+            <span id="hud-score">Score: <span id="score" class="valeur-hud">300</span></span>
         </div>
     </div>
 
