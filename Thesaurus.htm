@@ -5,7 +5,8 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Thesaurus</title>
-    <link rel="stylesheet" type="text/css" href="StyleLabo14.css" />
+    <link rel="stylesheet" type="text/css" href="StyleThesaurus.css" />
+    <link rel="stylesheet" type="text/css" href="StyleHUD.css" />
 
     <script src="WebGl.js"></script>
     <script src="ShaderCouleursTextures.js"></script>
@@ -99,9 +100,16 @@
                             objScene3D.binTriche = !objScene3D.binTriche;
                         }
                     } else {
-                        if (objScene3D.nbMursDetruisables > 0) {
+                        let scoreActuel = parseInt(document.getElementById('score').innerText);
+
+                        if (objScene3D.nbMursDetruisables > 0 && scoreActuel >= 50) {
                             if (detruireMurEnFace(objScene3D.camera, objScene3D.dedale)) {
                                 objScene3D.nbMursDetruisables--;
+
+                                document.getElementById('ouvreursMurs').innerText = objScene3D.nbMursDetruisables;
+
+                                scoreActuel -= 50;
+                                document.getElementById('score').innerText = scoreActuel;
                             }
                         }
                     }
@@ -365,8 +373,15 @@
         <div id="hud-container" style="display: none;"> <!-- Hide HUD initially -->
             <span class="sHUD">Niveau: <span id="niveau" class="valeur-hud">1</span></span>
             <span class="sHUD">Ouvreurs murs: <span id="ouvreursMurs" class="valeur-hud">4</span></span>
-            <span class="sHUD">Secondes: <span id="seconde" class="valeur-hud">60</span></span>
-            <span class="sHUD">Score: <span id="score" class="valeur-hud">0</span></span>
+
+            <div id="hud-timer" class="sHUD-timer sHUD-font-color-white">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 8 14"></polyline>
+                </svg><span id="seconde" class="valeur-hud">60</span>
+            </div>
+            <span id="hud-score">Score: <span id="score" class="valeur-hud">0</span></span>
         </div>
     </div>
 

@@ -15,7 +15,7 @@ function passerAuNiveauSuivant(objScene3D) {
     score += (secondes * 10);
 
     document.getElementById('score').innerText = score;
-    
+
     document.getElementById('seconde').innerText = "60";
     demarrerMinuterie();
 
@@ -80,6 +80,12 @@ function demarrerMinuterie() {
     intervalleMinuterie = setInterval(function () {
         let tempsRestant = parseInt(document.getElementById('seconde').innerText);
 
+        if (tempsRestant > 11) {
+            document.getElementById('hud-timer').className = "sHUD-font-color-white";
+        } else {
+            document.getElementById('hud-timer').className = "sHUD-font-color-red";
+        }
+
         if (tempsRestant > 0) {
             tempsRestant--;
             document.getElementById('seconde').innerText = tempsRestant;
@@ -112,7 +118,10 @@ function recommencerNiveau(objScene3D) {
     objScene3D.dedale[17][15] = COULOIR;
 
     let niveauActuel = parseInt(document.getElementById('niveau').innerText);
-    let ouvreurs = Math.floor((10 - niveauActuel) / 2) + (niveauActuel % 2 !== 0 ? 0 : 1);
+
+    const sequenceOuvreurs = [4, 4, 4, 3, 3, 2, 2, 1, 1, 0];
+    let ouvreurs = sequenceOuvreurs[niveauActuel - 1];
+
     if (niveauActuel === 1 || niveauActuel === 2) ouvreurs = 4;
     document.getElementById('ouvreursMurs').innerText = ouvreurs;
     objScene3D.nbMursDetruisables = ouvreurs;

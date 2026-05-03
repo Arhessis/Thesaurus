@@ -1,0 +1,80 @@
+#hud-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    color: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+}
+
+#hud-timer {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    margin: 0;
+
+    background: linear-gradient(to bottom, rgba(60, 60, 60, 0.85), rgba(10, 10, 10, 0.95));
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 6px 20px 6px 15px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.sHUD-font-color-white {
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 34px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.sHUD-font-color-red {
+    color: red;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 34px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+#hud-score {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    margin: 0;
+
+    background: linear-gradient(to bottom, rgba(60, 60, 60, 0.85), rgba(10, 10, 10, 0.95));
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 6px 20px 6px 15px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 34px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.sHUD {
+    background: linear-gradient(to bottom, rgba(60, 60, 60, 0.85), rgba(10, 10, 10, 0.95));
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 6px 20px 6px 15px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 34px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
