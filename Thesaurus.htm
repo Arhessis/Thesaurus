@@ -72,17 +72,24 @@
 
                 // Touches spéciales (vue aérienne, espace) gérées ici une seule fois
                 if (event.keyCode === 33) { // Page Up → vue aérienne
-                    if (!objScene3D.binVueAerienne) {
-                        objScene3D.cameraJoueur = objScene3D.camera.slice();
-                        objScene3D.binVueAerienne = true;
-                        objScene3D.binTriche = false;
-                        var camera = objScene3D.camera;
-                        setPositionsCameraXYZ([15.5, 37, 15.5], camera);
-                        setCiblesCameraXYZ([15.5, 0, 15.5], camera);
-                        setOrientationsXYZ([0, 0, 1], camera);
+                    let scoreActuel = parseInt(document.getElementById('score').innerText);
+
+                    if (scoreActuel >= 10) {
+                        scoreActuel -= 10;
+                        document.getElementById('score').innerText = scoreActuel;
+
+                        if (!objScene3D.binVueAerienne) {
+                            objScene3D.cameraJoueur = objScene3D.camera.slice();
+                            objScene3D.binVueAerienne = true;
+                            objScene3D.binTriche = false;
+                            var camera = objScene3D.camera;
+                            setPositionsCameraXYZ([15.5, 37, 15.5], camera);
+                            setCiblesCameraXYZ([15.5, 0, 15.5], camera);
+                            setOrientationsXYZ([0, 0, 1], camera);
+                        }
+                        effacerCanevas(objgl);
+                        dessiner(objgl, objProgShaders, objScene3D);
                     }
-                    effacerCanevas(objgl);
-                    dessiner(objgl, objProgShaders, objScene3D);
                 }
                 else if (event.keyCode === 34) { // Page Down → retour joueur
                     if (objScene3D.binVueAerienne && objScene3D.cameraJoueur) {
