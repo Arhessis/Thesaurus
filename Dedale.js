@@ -40,6 +40,7 @@ function detruireMurEnFace(camera, dedale) {
 
     if (dedale[targetZ][targetX] === MUR_OUVRABLE) {
         setCell(dedale, targetX, targetZ, COULOIR);
+        jouerSon('./Sounds/dig4.mp3');
         return true;
     }
 

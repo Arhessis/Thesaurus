@@ -82,5 +82,9 @@ function verifierCollisionTresor(objScene3D) {
 
     if (distance < 0.5) {
         passerAuNiveauSuivant(objScene3D);
+        jouerSon('./Sounds/found2.mp3', function() {
+            jouerSon('./Sounds/levelstart1.mp3');
+        });
     }
+    
 }

@@ -236,27 +236,7 @@ function tryMoveCamera(camera, dx, dz) {
   return canMoveX || canMoveZ;
 }
 
-// function deplacerCameraSouris(event) {
-//   if (!objScene3D || objScene3D.binVueAerienne) return;
-//   if (document.pointerLockElement !== document.getElementById('monCanvas')) return;
 
-//   var camera = objScene3D.camera;
-//   var sensitivity = 0.001;
-//   var fltYaw = -event.movementX * sensitivity;
-//   var fltPitch = event.movementY * sensitivity;
-
-//   rotateCamera(camera, fltYaw, fltPitch);
-
-//   var EYE_HEIGHT = 0.5;
-//   setPositionCameraY(EYE_HEIGHT, camera);
-//   setCibleCameraY(
-//     EYE_HEIGHT + getDirectionCameraXYZ(camera)[1],
-//     camera
-//   );
-
-//   effacerCanevas(objgl);
-//   dessiner(objgl, objProgShaders, objScene3D);
-// }
 
 function deplacerCameraSouris(event) {
   if (!objScene3D || objScene3D.binVueAerienne) return;
@@ -284,18 +264,38 @@ function deplacerCamera() {
     return;
   }
 
-  var camera = objScene3D.camera;
-  var keyUp = touchesEnfoncees[38] || touchesEnfoncees[87]; // ↑ W
-  var keyDown = touchesEnfoncees[40] || touchesEnfoncees[83]; // ↓ S
+  var camera = objScene3D.camera; // ← this line was missing
 
-  if (keyUp || keyDown) {
+  var keyForward = touchesEnfoncees[38] || touchesEnfoncees[87]; // ↑ W
+  var keyBack = touchesEnfoncees[40] || touchesEnfoncees[83]; // ↓ S
+  var keyLeft = touchesEnfoncees[37] || touchesEnfoncees[65]; // ← A
+  var keyRight = touchesEnfoncees[39] || touchesEnfoncees[68]; // → D
+
+  if (keyForward || keyBack || keyLeft || keyRight) {
     var tabDirection = getDirectionCameraXYZ(camera);
     tabDirection[1] = 0;
     tabDirection = normalizeVector(tabDirection);
 
-    var sign = keyUp ? 1 : -1;
-    var dx = tabDirection[0] * VITESSE_MAX * sign;
-    var dz = tabDirection[2] * VITESSE_MAX * sign;
+    var tabStrafeRight = normalizeVector(crossProduct([0, 1, 0], tabDirection));
+
+    var dx = 0, dz = 0;
+
+    if (keyForward) {
+      dx += tabDirection[0] * VITESSE_MAX;
+      dz += tabDirection[2] * VITESSE_MAX;
+    }
+    if (keyBack) {
+      dx -= tabDirection[0] * VITESSE_MAX;
+      dz -= tabDirection[2] * VITESSE_MAX;
+    }
+    if (keyLeft) {
+      dx += tabStrafeRight[0] * VITESSE_MAX;
+      dz += tabStrafeRight[2] * VITESSE_MAX;
+    }
+    if (keyRight) {
+      dx -= tabStrafeRight[0] * VITESSE_MAX;
+      dz -= tabStrafeRight[2] * VITESSE_MAX;
+    }
 
     tryMoveCamera(camera, dx, dz);
   }
@@ -320,7 +320,6 @@ function deplacerCamera() {
   effacerCanevas(objgl);
   dessiner(objgl, objProgShaders, objScene3D);
 
-  // Always keep the loop running while pointer is locked
   if (document.pointerLockElement === document.getElementById('monCanvas')) {
     requestAnimationFrame(deplacerCamera);
   } else {

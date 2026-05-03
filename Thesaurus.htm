@@ -41,6 +41,15 @@
 
         const HAUTEUR_PLAFOND = 1.5;
 
+        function jouerSon(src, callback) {
+            var audio = new Audio(src);
+            if (callback) {
+                audio.addEventListener('ended', callback);
+            }
+            audio.play();
+            return audio;
+        }
+
         function redimensionnerCanvas() {
             var objCanvas = document.getElementById('monCanvas');
             objCanvas.width = window.innerWidth;
@@ -425,13 +434,13 @@
             <button id="btn-jouer" onclick="demarrer()">Jouer</button>
         </div>
 
-        <canvas id="monCanvas" width="640" height="640" tabIndex="1" onkeydown="deplacerCamera(); return false">
+        <canvas id="monCanvas" width="640" height="640" tabIndex="1">
             Votre navigateur ne supporte pas la balise canvas
         </canvas>
 
         <!-- The HUD Div -->
         <div id="hud-container" style="display: none;"> <!-- Hide HUD initially -->
-            <span class="sHUD">Niveau: <span id="niveau" class="valeur-hud">1</span></span>
+            <span class="sHUD">Niveau: <span id="niveau" class="valeur-hud">10</span></span>
             <span class="sHUD">Ouvreurs murs: <span id="ouvreursMurs" class="valeur-hud">4</span></span>
             <span class="sHUD">Secondes: <span id="seconde" class="valeur-hud">60</span></span>
             <span class="sHUD">Score: <span id="score" class="valeur-hud">0</span></span>
