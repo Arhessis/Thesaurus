@@ -225,10 +225,6 @@ function demarrerMinuterie() {
                 effacerCanevas(objgl);
                 dessiner(objgl, objProgShaders, objScene3D);
             }
-
-            if (verifierScore()) {
-                return;
-            }
         }
 
         if (tempsRestant > 0) {
