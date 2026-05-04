@@ -86,9 +86,7 @@ function verifierCollisionTresor(objScene3D) {
 
     if (distance < 1.0) { // ← increased threshold from 0.5 to 1.0
         objScene3D.tresorTrouve = true;
-        jouerSon('./Sounds/found2.mp3', function() {
-            jouerSon('./Sounds/levelstart1.mp3');
-        });
+        jouerSon('./Sounds/found2.mp3');
         passerAuNiveauSuivant(objScene3D);
     }
 }

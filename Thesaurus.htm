@@ -48,12 +48,7 @@
 
         function jouerSon(src, callback) {
             var audio = new Audio(src);
-            if (typeof callback === 'function') {
-                audio.addEventListener('ended', callback);
-            }
-            audio.play().catch(function (e) {
-                // Autoplay blocked — ignore silently
-            });
+            audio.play()
             return audio;
         }
 
@@ -177,6 +172,7 @@
             document.getElementById('monCanvas').focus();
 
             demarrerMinuterie();
+            jouerSon('./Sounds/levelstart1.mp3');
         }
 
         async function initScene3D(objgl) {
@@ -389,7 +385,7 @@
 
         <!-- The HUD Div -->
         <div id="hud-container" style="display: none;"> <!-- Hide HUD initially -->
-            <span class="sHUD">Niveau: <span id="niveau" class="valeur-hud">1</span></span>
+            <span class="sHUD">Niveau: <span id="niveau" class="valeur-hud">3</span></span>
             <span class="sHUD">Ouvreurs murs: <span id="ouvreursMurs" class="valeur-hud">4</span></span>
 
             <div id="hud-timer" class="sHUD-timer sHUD-font-color-white">

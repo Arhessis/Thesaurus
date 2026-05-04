@@ -18,6 +18,7 @@ function passerAuNiveauSuivant(objScene3D) {
 
     document.getElementById('seconde').innerText = "60";
     demarrerMinuterie();
+    jouerSon('./Sounds/levelstart1.mp3');
 
     let ouvreurs = Math.floor((10 - niveauActuel) / 2) + (niveauActuel % 2 !== 0 ? 0 : 1);
     if (niveauActuel === 1 || niveauActuel === 2) ouvreurs = 4;
