@@ -37,6 +37,7 @@
         var objgl = null;
         var objProgShaders = null;
         var objScene3D = null;
+        var musiqueFond = null;
 
         var TEX_TRANSPARENT = 0;
         var TEX_OUVRABLES = 1;
@@ -55,7 +56,19 @@
                 }
             });
 
-            audio.play();
+            audio.play().catch(function (e) {
+                // Autoplay blocked — ignore silently
+            });
+            return audio;
+        }
+
+        function jouerSonBoucle(src, volume) {
+            var audio = new Audio(src);
+            audio.loop = true;
+            audio.volume = typeof volume === 'number' ? Math.max(0, Math.min(1, volume)) : 1.0;
+            audio.play().catch(function (e) {
+                // Autoplay blocked — try again later if needed
+            });
             return audio;
         }
 
@@ -184,6 +197,7 @@
             document.getElementById('hud-container').style.display = 'flex';
             document.getElementById('monCanvas').focus();
 
+            musiqueFond = jouerSonBoucle('./Sounds/music.mp3', 0.03);
             demarrerMinuterie();
             jouerSon('./Sounds/levelstart1.mp3');
         }
