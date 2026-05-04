@@ -278,7 +278,7 @@
             do {
                 randomXTresor = Math.floor(Math.random() * TAILLE_DEDALE);
                 randomZTresor = Math.floor(Math.random() * TAILLE_DEDALE);
-            } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR);
+            } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR || (randomXTresor >= 14 && randomXTresor <= 16 && randomZTresor >= 14 && randomZTresor <= 16));
             setPositionsXYZ([randomXTresor, 0, randomZTresor], tresor.transformations);
             setEchellesXYZ([0.7, 0.4, 0.4], tresor.transformations);
             tresor.typeObjet = "tresor";
@@ -316,6 +316,7 @@
                     randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
 
                     if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
+                        !(randomX >= 14 && randomX <= 16 && randomZ >= 14 && randomZ <= 16) &&
                         !(randomX === randomXTresor && randomZ === randomZTresor)) {
 
                         let tropProche = false;
@@ -365,7 +366,7 @@
                     randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
 
                     if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
-                        !(randomX === 15 && randomZ === 15) &&
+                        !(randomX >= 14 && randomX <= 16 && randomZ >= 14 && randomZ <= 16) &&
                         !(randomX === randomXTresor && randomZ === randomZTresor)) {
 
                         let conflit = false;
@@ -407,7 +408,7 @@
                     randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
 
                     if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
-                        !(randomX === 15 && randomZ === 15) &&
+                        !(randomX >= 14 && randomX <= 16 && randomZ >= 14 && randomZ <= 16) &&
                         !(randomX === randomXTresor && randomZ === randomZTresor)) {
 
                         let conflit = false;

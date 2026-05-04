@@ -61,7 +61,7 @@ function passerAuNiveauSuivant(objScene3D) {
     do {
         randomXTresor = Math.floor(Math.random() * TAILLE_DEDALE);
         randomZTresor = Math.floor(Math.random() * TAILLE_DEDALE);
-    } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR || (randomXTresor === 15 && randomZTresor === 15));
+    } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR || (randomXTresor >= 14 && randomXTresor <= 16 && randomZTresor >= 14 && randomZTresor <= 16));
 
     setPositionsXYZ([randomXTresor + 0.5, 0, randomZTresor + 0.5], objScene3D.tresor.transformations);
 
@@ -87,8 +87,8 @@ function passerAuNiveauSuivant(objScene3D) {
             randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
 
             if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
-                !(randomX === randomXTresor && randomZ === randomZTresor) &&
-                !(randomX === 15 && randomZ === 15)) {
+                !(randomX >= 14 && randomX <= 16 && randomZ >= 14 && randomZ <= 16) &&
+                !(randomX === randomXTresor && randomZ === randomZTresor)) {
                 celluleValide = true;
             }
         }
@@ -114,7 +114,7 @@ function passerAuNiveauSuivant(objScene3D) {
             randomX = Math.floor(Math.random() * TAILLE_DEDALE);
             randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
             if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
-                !(randomX === 15 && randomZ === 15) &&
+                !(randomX >= 14 && randomX <= 16 && randomZ >= 14 && randomZ <= 16) &&
                 !(randomX === randomXTresor && randomZ === randomZTresor)) {
                 let conflit = false;
                 for (let j = 0; j < objScene3D.tabFleches.length; j++) {
@@ -147,7 +147,7 @@ function passerAuNiveauSuivant(objScene3D) {
             randomX = Math.floor(Math.random() * TAILLE_DEDALE);
             randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
             if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
-                !(randomX === 15 && randomZ === 15) &&
+                !(randomX >= 14 && randomX <= 16 && randomZ >= 14 && randomZ <= 16) &&
                 !(randomX === randomXTresor && randomZ === randomZTresor)) {
                 let conflit = false;
                 for (let j = 0; j < objScene3D.tabFleches.length; j++) {
