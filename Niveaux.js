@@ -82,6 +82,21 @@ function passerAuNiveauSuivant(objScene3D) {
 
 }
 
+function verifierScore() {
+    let scoreActuel = parseInt(document.getElementById('score').innerText) || 0;
+    if (scoreActuel < 200) {
+        clearInterval(intervalleMinuterie);
+        boucleActive = false;
+        alert("Game Over! Score inférieur à 200.");
+        jouerSon('./Sounds/GameOver6.mp3', function (){
+            location.reload();
+        });
+        
+        return true;
+    }
+    return false;
+}
+
 function demarrerMinuterie() {
     clearInterval(intervalleMinuterie);
     document.getElementById('seconde').innerText = DUREE_NIVEAU_TEST;
@@ -99,15 +114,11 @@ function demarrerMinuterie() {
             tempsRestant--;
             document.getElementById('seconde').innerText = tempsRestant;
         } else {
-            let scoreActuel = parseInt(document.getElementById('score').innerText);
-            if (scoreActuel < 200) {
-                clearInterval(intervalleMinuterie);
-                boucleActive = false;
-                alert("Game Over! Score inférieur à 200.");
-                // Add GameOver audio trigger here later
-            } else {
-                recommencerNiveau(objScene3D);
+            if (verifierScore()) {
+                return;
             }
+            jouerSon('./Sounds/Fail3.mp3');
+            recommencerNiveau(objScene3D);
         }
     }, 1000);
 }
