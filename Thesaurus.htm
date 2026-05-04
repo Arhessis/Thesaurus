@@ -103,7 +103,6 @@
                     let scoreActuel = parseInt(document.getElementById('score').innerText);
 
                     if (scoreActuel >= 10) {
-                        scoreActuel -= 10;
                         document.getElementById('score').innerText = scoreActuel;
                         if (verifierScore()) {
                             return;
@@ -484,12 +483,29 @@
 </head>
 
 <body onload="init()">
-    <div class="game-container">
+    <div class="jeu-container">
 
         <div id="menu-container">
-            <h1 class="menu-title">Thesaurus</h1>
-            <p class="menu-subtitle">Par Bolu Ali-Balogun et George Georgiev</p>
+            <h1 class="menu-titre">Thesaurus</h1>
+            <p class="menu-soutitre">Par Bolu Ali-Balogun et George Georgiev</p>
             <button id="btn-jouer" onclick="demarrer()">Jouer</button>
+        </div>
+
+        <div id="victoire-container"
+            style="display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.85); flex-direction: column; justify-content: center; align-items: center; z-index: 20; color: white;">
+            <h1 class="menu-titre" style="color: gold;">Félicitations !</h1>
+            <p class="menu-soutitre">Vous avez trouvé tous les trésors et complété les 10 niveaux.</p>
+            <p class="menu-soutitre">Score final : <span id="score-final">0</span></p>
+            <button id="btn-rejouer" onclick="location.reload()"
+                style="padding: 15px 40px; font-size: 1.5rem; font-weight: bold; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 5px;">Rejouer</button>
+        </div>
+
+        <div id="defaite-container"
+            style="display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.85); flex-direction: column; justify-content: center; align-items: center; z-index: 20; color: white;">
+            <h1 class="menu-titre" style="color: red;">Game Over</h1>
+            <p class="menu-soutitre">Votre score est descendu en dessous de 200.</p>
+            <button onclick="location.reload()"
+                style="padding: 15px 40px; font-size: 1.5rem; font-weight: bold; cursor: pointer; background-color: #f44336; color: white; border: none; border-radius: 5px;">Réessayer</button>
         </div>
 
         <canvas id="monCanvas" width="640" height="640" tabIndex="1">

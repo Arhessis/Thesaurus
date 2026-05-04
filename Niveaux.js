@@ -4,6 +4,22 @@ function passerAuNiveauSuivant(objScene3D) {
 
     if (niveauActuel > 10) {
         boucleActive = false;
+        clearInterval(intervalleMinuterie);
+
+        let secondes = parseInt(document.getElementById('seconde').innerText);
+        let scoreFinal = parseInt(document.getElementById('score').innerText) + (secondes * 10);
+        document.getElementById('score-final').innerText = scoreFinal;
+
+        document.getElementById('hud-container').style.display = 'none';
+        document.getElementById('monCanvas').style.display = 'none';
+        document.getElementById('victoire-container').style.display = 'flex';
+
+        if (document.exitPointerLock) {
+            document.exitPointerLock();
+        }
+
+        jouerSon('./Sounds/Victory7.mp3');
+
         return;
     }
 
@@ -161,11 +177,16 @@ function verifierScore() {
     if (scoreActuel < 200) {
         clearInterval(intervalleMinuterie);
         boucleActive = false;
-        alert("Game Over! Score inférieur à 200.");
-        jouerSon('./Sounds/GameOver6.mp3', function () {
-            location.reload();
-        });
 
+        document.getElementById('hud-container').style.display = 'none';
+        document.getElementById('monCanvas').style.display = 'none';
+        document.getElementById('defaite-container').style.display = 'flex';
+
+        if (document.exitPointerLock) {
+            document.exitPointerLock();
+        }
+
+        jouerSon('./Sounds/GameOver6.mp3');
         return true;
     }
     return false;
@@ -182,6 +203,24 @@ function demarrerMinuterie() {
             document.getElementById('hud-timer').className = "sHUD-font-color-white";
         } else {
             document.getElementById('hud-timer').className = "sHUD-font-color-red";
+        }
+
+        if (objScene3D && objScene3D.binVueAerienne) {
+            let scoreActuel = parseInt(document.getElementById('score').innerText);
+            scoreActuel -= 10;
+            document.getElementById('score').innerText = scoreActuel;
+
+            if (scoreActuel < 10) {
+                objScene3D.camera = objScene3D.cameraJoueur.slice();
+                objScene3D.binVueAerienne = false;
+                objScene3D.binTriche = false;
+                effacerCanevas(objgl);
+                dessiner(objgl, objProgShaders, objScene3D);
+            }
+
+            if (verifierScore()) {
+                return;
+            }
         }
 
         if (tempsRestant > 0) {
