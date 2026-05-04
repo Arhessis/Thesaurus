@@ -51,7 +51,11 @@ function passerAuNiveauSuivant(objScene3D) {
 
     let nbFleches = 18 - ((niveauActuel - 1) * 2);
 
-    objScene3D.tabObjets3D = objScene3D.tabObjets3D.filter(obj => obj.typeObjet !== "fleche");
+    objScene3D.tabObjets3D = objScene3D.tabObjets3D.filter(obj =>
+        obj.typeObjet !== "fleche" &&
+        obj.typeObjet !== "teleporteur" &&
+        obj.typeObjet !== "recepteur"
+    );
     objScene3D.tabFleches = [];
 
     for (let i = 0; i < nbFleches; i++) {
@@ -80,6 +84,76 @@ function passerAuNiveauSuivant(objScene3D) {
 
     pointeVersTresor(objScene3D);
 
+    // --- NOUVEAUX TÉLÉ-TRANSPORTEURS ---
+    objScene3D.tabTeleporteurs = [];
+    let nbTeleporteurs = Math.floor(niveauActuel / 2);
+
+    for (let i = 0; i < nbTeleporteurs; i++) {
+        let tel = creerTeleporteur(objgl);
+        tel.typeObjet = "teleporteur";
+        setEchellesXYZ([1, 1, 1], tel.transformations);
+        let randomX, randomZ;
+        let celluleValide = false;
+        while (!celluleValide) {
+            randomX = Math.floor(Math.random() * TAILLE_DEDALE);
+            randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
+            if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
+                !(randomX === 15 && randomZ === 15) &&
+                !(randomX === randomXTresor && randomZ === randomZTresor)) {
+                let conflit = false;
+                for (let j = 0; j < objScene3D.tabFleches.length; j++) {
+                    let posF = getPositionsXYZ(objScene3D.tabFleches[j].transformations);
+                    if (Math.floor(posF[0]) === randomX && Math.floor(posF[2]) === randomZ) { conflit = true; break; }
+                }
+                for (let j = 0; j < objScene3D.tabTeleporteurs.length; j++) {
+                    let posT = getPositionsXYZ(objScene3D.tabTeleporteurs[j].transformations);
+                    if (Math.floor(posT[0]) === randomX && Math.floor(posT[2]) === randomZ) { conflit = true; break; }
+                }
+                if (!conflit) celluleValide = true;
+            }
+        }
+        setPositionsXYZ([randomX, 0.01, randomZ], tel.transformations);
+        objScene3D.tabTeleporteurs.push(tel);
+        objScene3D.tabObjets3D.push(tel);
+    }
+
+    // --- NOUVEAUX TÉLÉ-RÉCEPTEURS ---
+    objScene3D.tabRecepteurs = [];
+    let nbRecepteurs = niveauActuel - 1;
+
+    for (let i = 0; i < nbRecepteurs; i++) {
+        let rec = creerRecepteur(objgl);
+        rec.typeObjet = "recepteur";
+        setEchellesXYZ([1, 1, 1], rec.transformations);
+        let randomX, randomZ;
+        let celluleValide = false;
+        while (!celluleValide) {
+            randomX = Math.floor(Math.random() * TAILLE_DEDALE);
+            randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
+            if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
+                !(randomX === 15 && randomZ === 15) &&
+                !(randomX === randomXTresor && randomZ === randomZTresor)) {
+                let conflit = false;
+                for (let j = 0; j < objScene3D.tabFleches.length; j++) {
+                    let posF = getPositionsXYZ(objScene3D.tabFleches[j].transformations);
+                    if (Math.floor(posF[0]) === randomX && Math.floor(posF[2]) === randomZ) { conflit = true; break; }
+                }
+                for (let j = 0; j < objScene3D.tabTeleporteurs.length; j++) {
+                    let posT = getPositionsXYZ(objScene3D.tabTeleporteurs[j].transformations);
+                    if (Math.floor(posT[0]) === randomX && Math.floor(posT[2]) === randomZ) { conflit = true; break; }
+                }
+                for (let j = 0; j < objScene3D.tabRecepteurs.length; j++) {
+                    let posR = getPositionsXYZ(objScene3D.tabRecepteurs[j].transformations);
+                    if (Math.floor(posR[0]) === randomX && Math.floor(posR[2]) === randomZ) { conflit = true; break; }
+                }
+                if (!conflit) celluleValide = true;
+            }
+        }
+        setPositionsXYZ([randomX, 0.01, randomZ], rec.transformations);
+        objScene3D.tabRecepteurs.push(rec);
+        objScene3D.tabObjets3D.push(rec);
+    }
+
 }
 
 function verifierScore() {
@@ -88,10 +162,10 @@ function verifierScore() {
         clearInterval(intervalleMinuterie);
         boucleActive = false;
         alert("Game Over! Score inférieur à 200.");
-        jouerSon('./Sounds/GameOver6.mp3', function (){
+        jouerSon('./Sounds/GameOver6.mp3', function () {
             location.reload();
         });
-        
+
         return true;
     }
     return false;

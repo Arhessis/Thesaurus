@@ -21,6 +21,8 @@
     <script src="./Objets/Tresor.js"></script>
     <script src="./Objets/Fleches.js"></script>
     <script src="./Objets/Pointeur_joueur.js"></script>
+    <script src="./Objets/Teleporteur.js"></script>
+    <script src="./Objets/Recepteur.js"></script>
 
 
     <script type="text/javascript">
@@ -347,7 +349,91 @@
 
             pointeVersTresor(objScene3D);
 
-            // ── Pointeur du joueur dans la vue aérienne ─────────────────────────────────────────────────────
+            // --- TÉLÉ-TRANSPORTEURS ---
+            objScene3D.tabTeleporteurs = [];
+            let nbTeleporteurs = 0;
+
+            for (let i = 0; i < nbTeleporteurs; i++) {
+                let tel = creerTeleporteur(objgl);
+                tel.typeObjet = "teleporteur";
+                setEchellesXYZ([1, 1, 1], tel.transformations);
+
+                let randomX, randomZ;
+                let celluleValide = false;
+
+                while (!celluleValide) {
+                    randomX = Math.floor(Math.random() * TAILLE_DEDALE);
+                    randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
+
+                    if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
+                        !(randomX === 15 && randomZ === 15) &&
+                        !(randomX === randomXTresor && randomZ === randomZTresor)) {
+
+                        let conflit = false;
+                        for (let j = 0; j < objScene3D.tabFleches.length; j++) {
+                            let posF = getPositionsXYZ(objScene3D.tabFleches[j].transformations);
+                            if (Math.floor(posF[0]) === randomX && Math.floor(posF[2]) === randomZ) {
+                                conflit = true; break;
+                            }
+                        }
+                        for (let j = 0; j < objScene3D.tabTeleporteurs.length; j++) {
+                            let posT = getPositionsXYZ(objScene3D.tabTeleporteurs[j].transformations);
+                            if (Math.floor(posT[0]) === randomX && Math.floor(posT[2]) === randomZ) {
+                                conflit = true; break;
+                            }
+                        }
+
+                        if (!conflit) celluleValide = true;
+                    }
+                }
+                setPositionsXYZ([randomX, 0.01, randomZ], tel.transformations);
+                objScene3D.tabTeleporteurs.push(tel);
+                tabObjets3D.push(tel);
+            }
+
+            // --- TÉLÉ-RÉCEPTEURS ---
+            objScene3D.tabRecepteurs = [];
+            let nbRecepteurs = 0;
+
+            for (let i = 0; i < nbRecepteurs; i++) {
+                let rec = creerRecepteur(objgl);
+                rec.typeObjet = "recepteur";
+                setEchellesXYZ([1, 1, 1], rec.transformations);
+
+                let randomX, randomZ;
+                let celluleValide = false;
+
+                while (!celluleValide) {
+                    randomX = Math.floor(Math.random() * TAILLE_DEDALE);
+                    randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
+
+                    if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
+                        !(randomX === 15 && randomZ === 15) &&
+                        !(randomX === randomXTresor && randomZ === randomZTresor)) {
+
+                        let conflit = false;
+                        for (let j = 0; j < objScene3D.tabFleches.length; j++) {
+                            let posF = getPositionsXYZ(objScene3D.tabFleches[j].transformations);
+                            if (Math.floor(posF[0]) === randomX && Math.floor(posF[2]) === randomZ) { conflit = true; break; }
+                        }
+                        for (let j = 0; j < objScene3D.tabTeleporteurs.length; j++) {
+                            let posT = getPositionsXYZ(objScene3D.tabTeleporteurs[j].transformations);
+                            if (Math.floor(posT[0]) === randomX && Math.floor(posT[2]) === randomZ) { conflit = true; break; }
+                        }
+                        for (let j = 0; j < objScene3D.tabRecepteurs.length; j++) {
+                            let posR = getPositionsXYZ(objScene3D.tabRecepteurs[j].transformations);
+                            if (Math.floor(posR[0]) === randomX && Math.floor(posR[2]) === randomZ) { conflit = true; break; }
+                        }
+
+                        if (!conflit) celluleValide = true;
+                    }
+                }
+                setPositionsXYZ([randomX, 0.01, randomZ], rec.transformations);
+                objScene3D.tabRecepteurs.push(rec);
+                tabObjets3D.push(rec);
+            }
+
+            // --- POINTEUR DU JOUEUR (Vue Aérienne) ---
             var pointeur = creerPointeur(objgl, [1.0, 0.0, 0.0, 1.0]);
             pointeur.typeObjet = "pointeur";
             setEchellesXYZ([0, 0, 0], pointeur.transformations);
@@ -412,7 +498,7 @@
 
         <!-- The HUD Div -->
         <div id="hud-container" style="display: none;"> <!-- Hide HUD initially -->
-            <span class="sHUD">Niveau: <span id="niveau" class="valeur-hud">3</span></span>
+            <span class="sHUD">Niveau: <span id="niveau" class="valeur-hud">1</span></span>
             <span class="sHUD">Ouvreurs murs: <span id="ouvreursMurs" class="valeur-hud">4</span></span>
 
             <div id="hud-timer" class="sHUD-timer sHUD-font-color-white">

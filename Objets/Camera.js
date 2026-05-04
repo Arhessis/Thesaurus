@@ -317,6 +317,7 @@ function deplacerCamera() {
   }
 
   verifierCollisionTresor(objScene3D);
+  verifierTeleportation(objScene3D);
   effacerCanevas(objgl);
   dessiner(objgl, objProgShaders, objScene3D);
 
