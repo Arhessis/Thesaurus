@@ -71,6 +71,8 @@ function creerMaillageTresor(objgl) {
 }
 
 function verifierCollisionTresor(objScene3D) {
+    if (objScene3D.tresorTrouve) return;
+
     let camX = getPositionCameraX(objScene3D.camera);
     let camZ = getPositionCameraZ(objScene3D.camera);
 
@@ -80,11 +82,13 @@ function verifierCollisionTresor(objScene3D) {
 
     let distance = Math.sqrt(Math.pow(tresorX - camX, 2) + Math.pow(tresorZ - camZ, 2));
 
-    if (distance < 0.5) {
-        passerAuNiveauSuivant(objScene3D);
+    console.log("Distance tresor:", distance.toFixed(2), "| Tresor:", tresorX.toFixed(1), tresorZ.toFixed(1), "| Cam:", camX.toFixed(1), camZ.toFixed(1));
+
+    if (distance < 1.0) { // ← increased threshold from 0.5 to 1.0
+        objScene3D.tresorTrouve = true;
         jouerSon('./Sounds/found2.mp3', function() {
             jouerSon('./Sounds/levelstart1.mp3');
         });
+        passerAuNiveauSuivant(objScene3D);
     }
-    
 }
