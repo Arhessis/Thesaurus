@@ -36,8 +36,8 @@ function passerAuNiveauSuivant(objScene3D) {
     demarrerMinuterie();
     jouerSon('./Sounds/levelstart1.mp3');
 
-    let ouvreurs = Math.floor((10 - niveauActuel) / 2) + (niveauActuel % 2 !== 0 ? 0 : 1);
-    if (niveauActuel === 1 || niveauActuel === 2) ouvreurs = 4;
+    const sequenceOuvreurs = [4, 4, 3, 3, 2, 2, 1, 1, 0, 0];
+    let ouvreurs = sequenceOuvreurs[niveauActuel - 1];
     document.getElementById('ouvreursMurs').innerText = ouvreurs;
     objScene3D.nbMursDetruisables = ouvreurs;
 
@@ -56,6 +56,14 @@ function passerAuNiveauSuivant(objScene3D) {
     objScene3D.murSpawn.actif = false;
     objScene3D.binVueAerienne = false;
     objScene3D.dedale[17][15] = COULOIR;
+
+    for (let i = 0; i < objScene3D.tabObjets3D.length; i++) {
+        let objet = objScene3D.tabObjets3D[i];
+        if (objet.typeObjet === "mur" && objet.texels && objet.texels.intNoTexture === TEX_OUVRABLES) {
+            let posMur = getPositionsXYZ(objet.transformations);
+            objScene3D.dedale[Math.floor(posMur[2])][Math.floor(posMur[0])] = MUR_OUVRABLE;
+        }
+    }
 
     let randomXTresor, randomZTresor;
     do {
@@ -259,10 +267,8 @@ function recommencerNiveau(objScene3D) {
 
     let niveauActuel = parseInt(document.getElementById('niveau').innerText);
 
-    const sequenceOuvreurs = [4, 4, 4, 3, 3, 2, 2, 1, 1, 0];
+    const sequenceOuvreurs = [4, 4, 3, 3, 2, 2, 1, 1, 0, 0];
     let ouvreurs = sequenceOuvreurs[niveauActuel - 1];
-
-    if (niveauActuel === 1 || niveauActuel === 2) ouvreurs = 4;
     document.getElementById('ouvreursMurs').innerText = ouvreurs;
     objScene3D.nbMursDetruisables = ouvreurs;
 
