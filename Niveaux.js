@@ -28,8 +28,16 @@ function passerAuNiveauSuivant(objScene3D) {
     setCiblesCameraXYZ([15.5, 0.5, 16.5], objScene3D.camera);
     setOrientationsXYZ([0, 1, 0], objScene3D.camera);
 
-    objScene3D.aQuittSpawn = false;
+    if (objScene3D.cameraJoueur) {
+        setPositionsCameraXYZ([15.5, 0.5, 15.5], objScene3D.cameraJoueur);
+        setCiblesCameraXYZ([15.5, 0.5, 16.5], objScene3D.cameraJoueur);
+        setOrientationsXYZ([0, 1, 0], objScene3D.cameraJoueur);
+    }
+
+    objScene3D.tresorTrouve = false;
+    objScene3D.aQuittéSpawn = false;
     objScene3D.murSpawn.actif = false;
+    objScene3D.binVueAerienne = false;
     objScene3D.dedale[17][15] = COULOIR;
 
     let randomXTresor, randomZTresor;
@@ -113,7 +121,14 @@ function recommencerNiveau(objScene3D) {
     setCiblesCameraXYZ([15.5, 0.5, 16.5], objScene3D.camera);
     setOrientationsXYZ([0, 1, 0], objScene3D.camera);
 
-    objScene3D.aQuittSpawn = false;
+    if (objScene3D.cameraJoueur) {
+        setPositionsCameraXYZ([15.5, 0.5, 15.5], objScene3D.cameraJoueur);
+        setCiblesCameraXYZ([15.5, 0.5, 16.5], objScene3D.cameraJoueur);
+        setOrientationsXYZ([0, 1, 0], objScene3D.cameraJoueur);
+    }
+
+    objScene3D.tresorTrouve = false;
+    objScene3D.aQuittéSpawn = false;
     objScene3D.murSpawn.actif = false;
     objScene3D.dedale[17][15] = COULOIR;
 
