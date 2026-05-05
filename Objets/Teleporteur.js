@@ -101,7 +101,7 @@ function verifierTeleportation(objScene3D) {
             setCibleCameraX(posRec[0] + 0.5 + dir[0], objScene3D.camera);
             setCibleCameraZ(posRec[2] + 0.5 + dir[2], objScene3D.camera);
 
-            jouerSon('./Sounds/Teleportation.mp3');
+            jouerSon('./Sounds/teleport5.mp3');
 
             break;
         }
