@@ -271,7 +271,7 @@ function deplacerCamera() {
   var keyLeft = touchesEnfoncees[37] || touchesEnfoncees[65]; // ← A
   var keyRight = touchesEnfoncees[39] || touchesEnfoncees[68]; // → D
 
-  var ROTATION_SPEED = 0.02; // Adjust rotation speed as needed
+  var ROTATION_SPEED = 0.01; // Adjust rotation speed as needed
 
   if (keyForward || keyBack || keyLeft || keyRight) {
     var tabDirection = getDirectionCameraXYZ(camera);

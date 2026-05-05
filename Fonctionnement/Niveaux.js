@@ -231,11 +231,20 @@ function demarrerMinuterie() {
             tempsRestant--;
             document.getElementById('seconde').innerText = tempsRestant;
         } else {
-            if (verifierScore()) {
-                return;
+            // Le temps est écoulé
+            if (objScene3D.tresorTrouve) {
+                // Le joueur a trouvé le trésor → passer au niveau suivant
+                passerAuNiveauSuivant(objScene3D);
+            } else {
+                // Le joueur n'a pas trouvé le trésor
+                if (verifierScore()) {
+                    // Score < 200 → Game Over
+                    return;
+                }
+                // Score ≥ 200 → Recommencer le niveau
+                jouerSon('./Sounds/Fail3.mp3');
+                recommencerNiveau(objScene3D);
             }
-            jouerSon('./Sounds/Fail3.mp3');
-            recommencerNiveau(objScene3D);
         }
     }, 1000);
 }
