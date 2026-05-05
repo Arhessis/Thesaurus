@@ -21,6 +21,8 @@
     <script src="./Objets/Tresor.js"></script>
     <script src="./Objets/Fleches.js"></script>
     <script src="./Objets/Pointeur_joueur.js"></script>
+    <script src="./Objets/Teleporteur.js"></script>
+    <script src="./Objets/Recepteur.js"></script>
 
 
     <script type="text/javascript">
@@ -101,7 +103,6 @@
                     let scoreActuel = parseInt(document.getElementById('score').innerText);
 
                     if (scoreActuel >= 10) {
-                        scoreActuel -= 10;
                         document.getElementById('score').innerText = scoreActuel;
                         if (verifierScore()) {
                             return;
@@ -146,9 +147,6 @@
 
                                 scoreActuel -= 50;
                                 document.getElementById('score').innerText = scoreActuel;
-                                if (verifierScore()) {
-                                    return;
-                                }
                             }
                         }
                     }
@@ -277,7 +275,7 @@
             do {
                 randomXTresor = Math.floor(Math.random() * TAILLE_DEDALE);
                 randomZTresor = Math.floor(Math.random() * TAILLE_DEDALE);
-            } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR);
+            } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR || (randomXTresor >= 14 && randomXTresor <= 16 && randomZTresor >= 14 && randomZTresor <= 16));
             setPositionsXYZ([randomXTresor, 0, randomZTresor], tresor.transformations);
             setEchellesXYZ([0.7, 0.4, 0.4], tresor.transformations);
             tresor.typeObjet = "tresor";
@@ -315,6 +313,7 @@
                     randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
 
                     if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
+                        !(randomX >= 14 && randomX <= 16 && randomZ >= 14 && randomZ <= 16) &&
                         !(randomX === randomXTresor && randomZ === randomZTresor)) {
 
                         let tropProche = false;
@@ -347,7 +346,91 @@
 
             pointeVersTresor(objScene3D);
 
-            // ── Pointeur du joueur dans la vue aérienne ─────────────────────────────────────────────────────
+            // --- TÉLÉ-TRANSPORTEURS ---
+            objScene3D.tabTeleporteurs = [];
+            let nbTeleporteurs = 0;
+
+            for (let i = 0; i < nbTeleporteurs; i++) {
+                let tel = creerTeleporteur(objgl);
+                tel.typeObjet = "teleporteur";
+                setEchellesXYZ([1, 1, 1], tel.transformations);
+
+                let randomX, randomZ;
+                let celluleValide = false;
+
+                while (!celluleValide) {
+                    randomX = Math.floor(Math.random() * TAILLE_DEDALE);
+                    randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
+
+                    if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
+                        !(randomX >= 14 && randomX <= 16 && randomZ >= 14 && randomZ <= 16) &&
+                        !(randomX === randomXTresor && randomZ === randomZTresor)) {
+
+                        let conflit = false;
+                        for (let j = 0; j < objScene3D.tabFleches.length; j++) {
+                            let posF = getPositionsXYZ(objScene3D.tabFleches[j].transformations);
+                            if (Math.floor(posF[0]) === randomX && Math.floor(posF[2]) === randomZ) {
+                                conflit = true; break;
+                            }
+                        }
+                        for (let j = 0; j < objScene3D.tabTeleporteurs.length; j++) {
+                            let posT = getPositionsXYZ(objScene3D.tabTeleporteurs[j].transformations);
+                            if (Math.floor(posT[0]) === randomX && Math.floor(posT[2]) === randomZ) {
+                                conflit = true; break;
+                            }
+                        }
+
+                        if (!conflit) celluleValide = true;
+                    }
+                }
+                setPositionsXYZ([randomX, 0.01, randomZ], tel.transformations);
+                objScene3D.tabTeleporteurs.push(tel);
+                tabObjets3D.push(tel);
+            }
+
+            // --- TÉLÉ-RÉCEPTEURS ---
+            objScene3D.tabRecepteurs = [];
+            let nbRecepteurs = 0;
+
+            for (let i = 0; i < nbRecepteurs; i++) {
+                let rec = creerRecepteur(objgl);
+                rec.typeObjet = "recepteur";
+                setEchellesXYZ([1, 1, 1], rec.transformations);
+
+                let randomX, randomZ;
+                let celluleValide = false;
+
+                while (!celluleValide) {
+                    randomX = Math.floor(Math.random() * TAILLE_DEDALE);
+                    randomZ = Math.floor(Math.random() * TAILLE_DEDALE);
+
+                    if (objScene3D.dedale[randomZ][randomX] === COULOIR &&
+                        !(randomX >= 14 && randomX <= 16 && randomZ >= 14 && randomZ <= 16) &&
+                        !(randomX === randomXTresor && randomZ === randomZTresor)) {
+
+                        let conflit = false;
+                        for (let j = 0; j < objScene3D.tabFleches.length; j++) {
+                            let posF = getPositionsXYZ(objScene3D.tabFleches[j].transformations);
+                            if (Math.floor(posF[0]) === randomX && Math.floor(posF[2]) === randomZ) { conflit = true; break; }
+                        }
+                        for (let j = 0; j < objScene3D.tabTeleporteurs.length; j++) {
+                            let posT = getPositionsXYZ(objScene3D.tabTeleporteurs[j].transformations);
+                            if (Math.floor(posT[0]) === randomX && Math.floor(posT[2]) === randomZ) { conflit = true; break; }
+                        }
+                        for (let j = 0; j < objScene3D.tabRecepteurs.length; j++) {
+                            let posR = getPositionsXYZ(objScene3D.tabRecepteurs[j].transformations);
+                            if (Math.floor(posR[0]) === randomX && Math.floor(posR[2]) === randomZ) { conflit = true; break; }
+                        }
+
+                        if (!conflit) celluleValide = true;
+                    }
+                }
+                setPositionsXYZ([randomX, 0.01, randomZ], rec.transformations);
+                objScene3D.tabRecepteurs.push(rec);
+                tabObjets3D.push(rec);
+            }
+
+            // --- POINTEUR DU JOUEUR (Vue Aérienne) ---
             var pointeur = creerPointeur(objgl, [1.0, 0.0, 0.0, 1.0]);
             pointeur.typeObjet = "pointeur";
             setEchellesXYZ([0, 0, 0], pointeur.transformations);
@@ -398,12 +481,29 @@
 </head>
 
 <body onload="init()">
-    <div class="game-container">
+    <div class="jeu-container">
 
         <div id="menu-container">
-            <h1 class="menu-title">Thesaurus</h1>
-            <p class="menu-subtitle">Par Bolu Ali-Balogun et George Georgiev</p>
+            <h1 class="menu-titre">Thesaurus</h1>
+            <p class="menu-soutitre">Par Bolu Ali-Balogun et George Georgiev</p>
             <button id="btn-jouer" onclick="demarrer()">Jouer</button>
+        </div>
+
+        <div id="victoire-container"
+            style="display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.85); flex-direction: column; justify-content: center; align-items: center; z-index: 20; color: white;">
+            <h1 class="menu-titre" style="color: gold;">Félicitations !</h1>
+            <p class="menu-soutitre">Vous avez trouvé tous les trésors et complété les 10 niveaux.</p>
+            <p class="menu-soutitre">Score final : <span id="score-final">0</span></p>
+            <button id="btn-rejouer" onclick="location.reload()"
+                style="padding: 15px 40px; font-size: 1.5rem; font-weight: bold; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 5px;">Rejouer</button>
+        </div>
+
+        <div id="defaite-container"
+            style="display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.85); flex-direction: column; justify-content: center; align-items: center; z-index: 20; color: white;">
+            <h1 class="menu-titre" style="color: red;">Game Over</h1>
+            <p class="menu-soutitre">Votre score est descendu en dessous de 200.</p>
+            <button onclick="location.reload()"
+                style="padding: 15px 40px; font-size: 1.5rem; font-weight: bold; cursor: pointer; background-color: #f44336; color: white; border: none; border-radius: 5px;">Réessayer</button>
         </div>
 
         <canvas id="monCanvas" width="640" height="640" tabIndex="1">
