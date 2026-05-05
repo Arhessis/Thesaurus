@@ -42,10 +42,15 @@ function passerAuNiveauSuivant(objScene3D) {
     objScene3D.dedale[17][15] = COULOIR;
 
     let randomXTresor, randomZTresor;
-    do {
-        randomXTresor = Math.floor(Math.random() * TAILLE_DEDALE);
-        randomZTresor = Math.floor(Math.random() * TAILLE_DEDALE);
-    } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR || (randomXTresor === 15 && randomZTresor === 15));
+    if (niveauActuel === 10) {
+        randomXTresor = 15;
+        randomZTresor = 25;
+    } else {
+        do {
+            randomXTresor = Math.floor(Math.random() * TAILLE_DEDALE);
+            randomZTresor = Math.floor(Math.random() * TAILLE_DEDALE);
+        } while (objScene3D.dedale[randomZTresor][randomXTresor] !== COULOIR || (randomXTresor === 15 && randomZTresor === 15));
+    }
 
     setPositionsXYZ([randomXTresor + 0.5, 0, randomZTresor + 0.5], objScene3D.tresor.transformations);
 

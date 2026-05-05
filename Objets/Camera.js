@@ -271,6 +271,8 @@ function deplacerCamera() {
   var keyLeft = touchesEnfoncees[37] || touchesEnfoncees[65]; // ← A
   var keyRight = touchesEnfoncees[39] || touchesEnfoncees[68]; // → D
 
+  var ROTATION_SPEED = 0.02; // Adjust rotation speed as needed
+
   if (keyForward || keyBack || keyLeft || keyRight) {
     var tabDirection = getDirectionCameraXYZ(camera);
     tabDirection[1] = 0;
@@ -279,6 +281,7 @@ function deplacerCamera() {
     var tabStrafeRight = normalizeVector(crossProduct([0, 1, 0], tabDirection));
 
     var dx = 0, dz = 0;
+    var yaw = 0;
 
     if (keyForward) {
       dx += tabDirection[0] * VITESSE_MAX;
@@ -289,15 +292,19 @@ function deplacerCamera() {
       dz -= tabDirection[2] * VITESSE_MAX;
     }
     if (keyLeft) {
-      dx += tabStrafeRight[0] * VITESSE_MAX;
-      dz += tabStrafeRight[2] * VITESSE_MAX;
+      yaw += ROTATION_SPEED;
     }
     if (keyRight) {
-      dx -= tabStrafeRight[0] * VITESSE_MAX;
-      dz -= tabStrafeRight[2] * VITESSE_MAX;
+      yaw -= ROTATION_SPEED;
     }
 
-    tryMoveCamera(camera, dx, dz);
+    if (yaw !== 0) {
+      rotateCamera(camera, yaw, 0);
+    }
+
+    if (dx !== 0 || dz !== 0) {
+      tryMoveCamera(camera, dx, dz);
+    }
   }
 
   // ── FERMETURE DU SPAWN ─────────────────────────────────────
